@@ -21,11 +21,11 @@ from .forms import *
 from .models import User, Applicant, Employer, Experience, Vacancy
 
 
+REGISTRATION_SUCCESS = "You're has been successfully registered"
+
+
 class HomeView(View):
     def get(self, request):
-        #User.objects.get(pk=40).delete()
-        #User.objects.filter(id__gt=40).delete()
-        #Applicant.objects.filter(id__gt=1).delete()
         return render(request, 'home.html')
 
 
@@ -362,8 +362,8 @@ class ApplicantRegistrationView(View):
             user = user.save()
             Applicant.objects.create(user=user)
             send_mail(
-                'Successfully registration',
-                'Glad to see you in our site!',
+                REGISTRATION_SUCCESS,
+                f'Dear {user.first_name} {user.last_name},\nWelcome to GimmeJob!',
                 EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
@@ -384,10 +384,9 @@ class EmployerRegistrationView(View):
         if user.is_valid():
             user = user.save()
             Employer.objects.create(user=user)
-            #Vacancy.objects.create(applicant=employer)
             send_mail(
-                'Successfully registration',
-                'Glad to see you in our site!',
+                REGISTRATION_SUCCESS,
+                f'Dear {user.first_name} {user.last_name},\nWelcome to GimmeJob!',
                 EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
