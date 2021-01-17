@@ -10,13 +10,12 @@ from .choices import *
 
 
 class UserManager(BaseUserManager):
-    def create_user(self, first_name, last_name, email, password, company=None, photo=None):
+    def create_user(self, first_name, last_name, email, password, company=None):
         user = self.model(
             first_name=first_name, 
             last_name=last_name, 
             email=self.normalize_email(email), 
-            company=company,
-            photo=photo
+            company=company
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -124,3 +123,4 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return f'{self.employer.user.company} {self.position}'
+
