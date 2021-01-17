@@ -26,9 +26,6 @@ REGISTRATION_SUCCESS = "You're has been successfully registered"
 
 class HomeView(View):
     def get(self, request):
-        #User.objects.get(pk=40).delete()
-        #User.objects.filter(id__gt=40).delete()
-        #Applicant.objects.filter(id__gt=1).delete()
         return render(request, 'home.html')
 
 
@@ -367,11 +364,11 @@ class ApplicantRegistrationView(View):
             send_mail(
                 REGISTRATION_SUCCESS,
                 f'Dear {user.first_name} {user.last_name},\nWelcome to GimmeJob!',
-                EMAIL_HOST_USER, 
+                EMAIL_HOST_USER,
                 [user.email],
                 fail_silently=False,
             )
-            return render(request, 'registration/success.html', {'user': user})
+            return render(request, 'registration/registration_success.html', {'user': user})
             #return redirect('home')
         for error in user.errors:
             messages.error(request, user.errors[error])
@@ -387,7 +384,6 @@ class EmployerRegistrationView(View):
         if user.is_valid():
             user = user.save()
             Employer.objects.create(user=user)
-            #Vacancy.objects.create(applicant=employer)
             send_mail(
                 REGISTRATION_SUCCESS,
                 f'Dear {user.first_name} {user.last_name},\nWelcome to GimmeJob!',
@@ -395,7 +391,7 @@ class EmployerRegistrationView(View):
                 [user.email],
                 fail_silently=False,
             )
-            return render(request, 'registration/success.html', {'user': user})
+            return render(request, 'registration/registration_success.html', {'user': user})
             #return redirect('home')
         for error in user.errors:
             messages.error(request, user.errors[error])
@@ -579,9 +575,8 @@ class PasswordResetView(View):
             user_email = form.cleaned_data['email']
             try:
                 user = User.objects.get(email=user_email)
-            except User.DoesNotExist:
+            except Exception:
                 messages.error(request, 'Invalid email')
-                return redirect('password_reset')
             
             context = {
                 "user": user, 
@@ -590,7 +585,6 @@ class PasswordResetView(View):
                 'token': default_token_generator.make_token(user),
                 'protocol': 'https://'
             }
-
             url = reverse(
                 'password_reset_completed', 
                 kwargs={
@@ -598,7 +592,6 @@ class PasswordResetView(View):
                     'token': context['token']
                 }
             )
-
             link = f"{context['protocol']}{context['domain']}{url}"
             subject = "Password Reset Instruction"
             message = f"To reset your password click at this link:\n{link}"
@@ -622,40 +615,38 @@ class PasswordResetLinkView(View):
 
 
 class PasswordResetCompletedView(View):
-    def get(self, request, *args, **kwargs):
+    def get(self, request, uidb64, token):
         try:
-            user_id = force_text(urlsafe_base64_decode(kwargs['uidb64']))
+            user_id = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=user_id)
-            if not default_token_generator.check_token(user, kwargs['token']):
+            if not default_token_generator.check_token(user, token):
                 messages.error(request, 'Invalid link, get a new one')
                 return redirect('password_reset')
-        except User.DoesNotExist:
+        except Exception:
             messages.error(request, 'Invalid email')
-            return redirect('password_reset')
-        
-        context = {
-            'form': MyPasswordSetForm(user),
-            'uidb64': kwargs['uidb64'], 
-            'token': kwargs['token']
-        }
-        return render(request, 'password/reset/set.html', context)
+        else:
+            context = {
+                'form': MyPasswordSetForm(user),
+                'uidb64': uidb64, 
+                'token': token
+            }
+            return render(request, 'password/reset/set.html', context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, uidb64, token):
         try:
-            user_id = force_text(urlsafe_base64_decode(kwargs['uidb64']))
+            user_id = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=user_id)
-        except User.DoesNotExist:
+        except Exception:
             messages.error(request, 'Invalid email')
-            return redirect('password_reset')
-        
-        form = MyPasswordSetForm(user, request.POST)
-        if form.is_valid():
-            form.save()
-            return render(request, 'password/reset/completed.html')
+        else:
+            form = MyPasswordSetForm(user, request.POST)
+            if form.is_valid():
+                form.save()
+                return render(request, 'password/reset/completed.html')
 
-        for error in form.errors:
-            messages.error(request, form.errors[error])
-        return redirect('password_reset')
+            for error in form.errors:
+                messages.error(request, form.errors[error])
+            return redirect('password_reset')
 
 
 def error_400(request, exception):
