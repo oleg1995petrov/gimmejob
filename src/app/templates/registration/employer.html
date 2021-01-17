@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Employer
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h2>Create an employer account</h2><hr>
+        <form action="{% url 'registration_employer' %}" method="POST">
+            {% csrf_token %}
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.first_name|as_crispy_field }}</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.last_name|as_crispy_field }}</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.email|as_crispy_field }}</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.company|as_crispy_field }}</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.password1|as_crispy_field }}</div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-row-field-1">{{ form.password2|as_crispy_field }}</div>
+            </div>
+
+            <div class="hint">
+                <p>Your password can’t be too similar to your other personal information.</p>
+                <p>Your password must contain at least 8 characters.</p>
+                <p>Your password can’t be a commonly used password.</p>
+                <p>Your password can’t be entirely numeric.</p>
+            </div><br>
+
+            <button class="button button-green" type="submit">Create</button>
+        </div>
+        </form>
+    </div>
+{% endblock %}

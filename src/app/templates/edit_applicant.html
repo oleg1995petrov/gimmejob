@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %} 
+
+{% block title %}
+    Profile editing
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header-left">
+        <form action={% url 'edit_personal' %} method="POST">
+            {% csrf_token %}
+            <h2>Basic info</h2><hr>
+                <div class="form-row">
+                    <div class="form-row-field-2">
+                        {{ user_form.first_name|as_crispy_field }}
+                    </div>
+                    <div class="form-row-field-2">
+                        {{ user_form.last_name|as_crispy_field }}
+                    </div>
+                </div>
+            
+                <div class="form-row">
+                    <div class="form-row-field-2">
+                        {{ user_form.email|as_crispy_field }}
+                    </div>
+                    <div class="form-row-field-2">
+                        {{ profile_form.birthday|as_crispy_field }}
+                    </div>
+                </div> 
+                
+                <div class="form-row">
+                    <div class="form-row-field-2">
+                        {{ profile_form.location|as_crispy_field }}
+                    </div>
+                    <div class="form-row-field-2">
+                        {{ profile_form.citizenship|as_crispy_field }}
+                    </div>
+                </div>
+                
+            <div class="center">
+                <button class="button button-red" type="button" onclick="history.go(-1)">Cancel</button>
+                <button class="button button-green" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Page not found
+{% endblock %}
+    
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h2>Error</h2><hr>
+        <h5>Page not found</h5><br>
+    <button class="button button-other" type="button" onclick="history.go(-1)">Back</button>
+    </div>
+{% endblock %}

@@ -1,0 +1,261 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if user.company %}
+        {{ user_view.company }}
+    {% else %}
+        {{ user_view.first_name }} {{ user_view.last_name }}
+    {% endif %}
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    {% if not user_view.company %}
+    
+<!-- APPLICANT -->
+
+        <div class="header">
+            <h2>{{ user_view.first_name }} {{ user_view.last_name }}
+                {% if user == user_view %}
+                    <a class="action-link" href="{% url 'edit_personal' %}">Edit</a>
+                {% endif %}
+            </h2><hr>
+        </div>
+
+        <div class="oneline">
+            {% if user_view.applicant.photo %}
+                <div class="avatar-applicant" >
+                    <!-- <img src="{{MEDIA_URL}}{{user_view.applicant.photo.url}} " alt="user_view's photo">> -->
+                    <img src="http://{{ domain }}{{ MEDIA_URL }}{{user_view.applicant.photo.url}} " alt="avatar">
+                </div>
+            {% else %}
+                <div class="avatar-applicant">
+                    <img src="http://{{ domain }}/media/blank.png" alt="avatar">
+                </div>
+            {% endif %}
+
+            <div class="property">
+                {% if user_view.applicant.birthday %}
+                    <p>Age:</p>
+                    <p>Born: </p>
+                {% endif %}
+
+                <p>Email:</p>
+
+                {% if user_view.applicant.location %}
+                    <p>Location:</p>
+                {% endif %}
+
+                {% if user_view.applicant.citizenship %}
+                    <p>Citizenship: </p>
+                {% endif %}
+            </div>
+
+            <div class="value">
+                {% if user_view.applicant.birthday %}
+                    <p>{{ age }}</p>
+                    <p>{{ user_view.applicant.birthday }}</p>
+                {% endif %}
+
+                <p>{{ user_view.email }}</p>
+
+                {% if user_view.applicant.location %}
+                    <p>{{ user_view.applicant.location }}</p>
+                {% endif %}
+
+                {% if user_view.applicant.citizenship %}
+                    <p>{{ user_view.applicant.citizenship }}</p>
+                {% endif %}
+            </div>
+
+        </div>
+        {% if user == user_view %}
+            <a href="{% url 'edit_photo' %}"><button class="button button-other" type="submit">Change</button></a>
+        {% endif %}
+
+        <h4>Education 
+            {% if user == user_view %}
+                <a class="action-link" href="{% url 'edit_education' %}">Edit</a>
+            {% endif %}
+        </h4><hr>
+
+        <div class="oneline">
+            <div class="property">
+                {% if user_view.applicant.education %}
+                    <p>Degree: </p>
+                {% endif %}
+
+                {% if user_view.applicant.specialization %}
+                    <p>Specialization: </p>
+                {% endif %}
+            </div>
+            <div class="value">
+                {% if user_view.applicant.education %}
+                    {% if user_view.applicant.education == 'high school' %}
+                        <p>{{ user_view.applicant.education.title }}</p>
+                    {% else %}
+                        <p>{{ user_view.applicant.education.title }}'s</p>
+                    {% endif %}
+                {% endif %}
+
+                {% if user_view.applicant.specialization %}
+                    <p>{{ user_view.applicant.specialization.title }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h4>Experience 
+            {% if user == user_view %}
+                {% if not first_exp %}
+                    <a class="action-link" href="{% url 'add_experience' %}">Add</a>
+                {% else %}
+                    <a class="action-link" href="{% url 'edit_experience' %}">Edit</a>
+                {% endif %}
+
+               
+            {% endif %}
+        </h4><hr>
+        
+            {% for exp in experience %}
+                <div class="oneline">
+                    <div class="property">
+                        <p>{{ exp.begin }}&#8212;</p>
+                        {% if exp.now %}
+                            <p>Till this day</p>
+                        {% else %}
+                            <p>{{ exp.end }}</p>
+                        {% endif %}
+                        {% if user == user_view %}
+                            <a class="action-link" href="{% url 'delete_experience' exp.id %}">Delete</a>
+                        {% endif %}
+                    </div>
+                    <div class="value">
+                        <p><b>{{ exp.company.title }}</p></b>
+                        {% if exp.company_site %}
+                            <p><a href="{{ exp.company_site }}">{{ exp.company_site }}</a></p>
+                        {% endif %}
+                        <p>{{ exp.company_spheres }}</p><br>
+                        <p><b>{{ exp.position.capitalize }}</p></b>
+                        <p>{{ exp.responsibilities.capitalize }}</p>
+                    </div>
+                </div><br>
+                
+                {% if last_exp != exp and first_exp != last_exp %}
+                    <hr class="hr-grey">
+                {% else %}
+                {% endif %}
+            {% endfor %}
+
+
+        <h4>Skills 
+            {% if user == user_view %}
+                <a class="action-link" href="{% url 'edit_skills' %}">Edit</a>
+            {% endif %}
+        </h4><hr>
+
+        <div class="oneline">
+            <div class="value-without-property">
+                {% if user_view.applicant.skills %}
+                    <p>{{ user_view.applicant.skills }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <h4>Languages 
+            {% if user == user_view %}
+                <a class="action-link" href="{% url 'edit_languages' %}">Edit</a>         
+            {% endif %}
+        </h4><hr>
+        
+        <div class="oneline">
+            <div class="value-without-property">
+                {% if user_view.applicant.languages %}
+                    <p>{{ user_view.applicant.languages }}</p><br><br>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+
+<!-- EMPLOYER -->
+
+        <div class="header">
+            <h2>{{ user_view.company }}
+            {% if user == user_view %}
+                <a class="action-link" href="{% url 'edit_personal' %}">Edit</a>
+            {% endif %}
+            </h2><hr>
+        </div>
+
+        {% if user_view.employer.photo %}
+            <div class="avatar-company">
+                <!-- <img src="{{MEDIA_URL}}{{user_view.employer.photo.url}} " alt="user_view's photo">> -->
+                <img src="http://{{ domain }}{{ MEDIA_URL }}{{user_view.employer.photo.url}} " alt="company-logo">
+            </div>
+        {% else %}
+            <div class="avatar-company">
+                <img src="http://{{ domain }}/media/blank-company.png" alt="company-logo">
+            </div>  
+        {% endif %}
+
+            <h2 style="font-style: italic; color:red;">Interactive picture/s with jQuery e.g.</h2>
+
+        {% if user == user_view %}
+            <div class="center">
+                <a href="{% url 'edit_photo' %}"><button class="button button-other" type="submit">Change</button></a>
+            </div>
+        {% endif %}
+
+        <h4>Or</h4><hr>
+        <div class="value-without-property">
+            <p>Something with text about the company. History, goals, missions, values, features, advantages, etc.</p>
+        </div>
+
+        <h4>Contacts</h4><hr>
+            {% if user_view.employer.company_site %}
+                <div class="oneline">
+                    <div class="property">
+                        <p>Web site:</p>  
+                    </div> 
+                    <div class="value">
+                        <p><a class="link" href="{{ user_view.employer.company_site }}">{{ user_view.employer.company_site }}</a>.</p>
+                    </div>
+                </div>
+            {% endif%}
+       
+            {% if user_view.employer.company_email %}
+                <div class="oneline">
+                    <div class="property">
+                        <p>Email:</p>
+                    </div>
+                    <div class="value">
+                        <p>{{ user_view.employer.company_email }}</p>
+                    </div>
+                </div>
+            {% endif%}
+        
+        {% if user == user_view %}
+            <h4><a href="{% url 'vacancies' user.id %}">Vacancies</a></h4><hr>
+        {% else %}
+            <h4>Vacancies</h4><hr>
+        {% endif %}
+
+            {% if active_vacancies %}
+                <p class="f1">Vacancies: {{ active_vacancies_count }}</p>
+                {% for vacancy in active_vacancies %}
+                    <p class="text-indent-left"><a class="vacancy-a" href="{% url 'vacancy' vacancy.id %}">{{ vacancy.position }}</a></p>
+                {% endfor %}
+            {% else %}
+                {% if user != user_view %}
+                    <p>The company didn't post information about open vacancies.</p>   
+                {% endif %}
+            {% endif%}
+    {% endif%}
+{% endblock %}

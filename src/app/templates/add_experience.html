@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Experience adding
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header-left">
+        <form action={% url 'add_experience' %} method="POST">
+            {% csrf_token %}
+            <h2>Work experience</h2><hr>
+            {{ forms.management_form }}
+            {% for form in forms%}
+                {{ f.id }}
+
+                <div class="form-row">
+                    <div class="required form-row-field-2">
+                        {{ form.begin|as_crispy_field }}
+                    </div>
+                    <div class="form-row-field-2">
+                        {{ form.end|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-row-field-checkbox-2">
+                        {{ form.now|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-row-field-2">
+                        {{ form.company|as_crispy_field }}
+                    </div>
+                    <div class="form-row-field-2">
+                        {{ form.company_site|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <p class="checkbox-label">{{ form.company_spheres.label }}<span class=asteriskField>*</span></p>
+                    <div class="form-row-field-checkbox-2">
+                        {{ form.company_spheres }}
+                    </div>
+                </div>
+                    
+                <div class="form-row">
+                    <div class="form-row-field-2">
+                        {{ form.position|as_crispy_field }}
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-row-field-area">
+                        {{ form.responsibilities|as_crispy_field }}
+                    </div>
+                </div>
+            {% endfor %}
+            <hr>
+            <div class="center">
+                <button class="button button-red" type="button" onclick="history.go(-1)">Cancel</button>
+                <button class="button button-green" type="submit">Add</button>
+            <br><br><br><br><br><br><br><br><br><br>
+            </div>
+        </form>
+    </div>
+{% endblock %}

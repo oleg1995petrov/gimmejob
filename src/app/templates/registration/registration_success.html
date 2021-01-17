@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Successfully registred
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h2>Your account has been successfully created</h2><hr><br>
+        <p class="f1">Welcome {{ user.first_name }}! Now you can log in.</p>
+    </div>
+{% endblock %}
+

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {{ vacancy.position }}
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <h2 class="header">{{ vacancy.position }}
+        {% if user.employer == employer %}
+            <a class="action-link" href="{% url 'vacancies' user.id %}?edit=True&vac_id={{ vacancy.id }}">Edit</a>
+        {% endif %}
+    </h2><hr>
+
+    <div class="f1">
+        <h5>from {{ vacancy.salary}} $</h5>
+        <h5><a href="{% url 'profile' company_id %}">{{ company }}</a></h5><br>
+        <h5>{{ vacancy.need_exp }}</h5>
+        <h5>{{ vacancy.employment }}, {{ vacancy.need_exp }}</h5><br>
+        <p>{{ body }}</p>
+    </div>
+
+    <br><br><hr> 
+{% endblock %}

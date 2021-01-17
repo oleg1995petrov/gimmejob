@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Home page
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        {% if request.user.is_authenticated %}
+            <h2>Welcome to your dashboard</h2><hr>
+        {% else %}
+            <h3>You are Welcome! Make yourself at home, traveler.</h3><hr>
+            <p class="f1">To use all the features of our service, you must log into your account.</p>
+        {% endif %}
+    </div>
+{% endblock %}

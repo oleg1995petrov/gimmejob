@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Link sent
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header">
+        <h2>Email sent</h2><hr>
+    </div>
+    <p class="f1">
+        We've emailed you instructions for setting your password. You should receive them shortly.
+    </h5><br>
+    <p class="f1">
+        If you don't receive an email, please make sure you've entered the address you registered with, and check your spam folder.
+    </h5>
+{% endblock %}

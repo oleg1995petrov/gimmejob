@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    My vacancies
+{% endblock %}
+
+{% block aside %}
+    <ul>
+        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
+    </ul>
+{% endblock %}
+
+{% block content %}
+    <div class="header-left">
+        <form action={% url 'vacancies' user_view.id %} method="POST">
+            {% csrf_token %}
+            <h2>My vacancies <a class="action-link" href="{% url 'vacancies' user_view.id %}?add=1">Add</a></h2><hr>
+            {% if active_vacancies %}
+                <div class="text-indent-left">
+                    <h5>Active vacancies:</h5>
+                    {% for vacancy in active_vacancies %}
+                        <p><a href="{% url 'vacancy' vacancy.id%}">{{ vacancy.position }}</a>&ensp;&#8212;&ensp;
+                            <a class="action-link" href="{% url 'vacancies' user.id%}?delete=1&vac_id={{ vacancy.id }}">delete vacancy</a></p>
+                    {% endfor %}
+                </div>
+                    <hr class="hr-grey">
+            {% endif %}
+
+            {% if inactive_vacancies %}
+            <div class="text-indent-left">
+                <h5>Inactive vacancies:</h5>
+                {% for vacancy in inactive_vacancies %}
+                    <p><a class="vacancy-a" href="{% url 'vacancies' user.id %}?edit=1&vac_id={{ vacancy.id }}">{{ vacancy.position }}</a> &ensp;&#8212;&ensp;
+                        <a class="action-link" href="{% url 'vacancies' user.id%}?delete=1&vac_id={{ vacancy.id }}">delete vacancy</a></p>
+                {% endfor %}
+                <hr class="hr-grey">
+            </div>
+            {% endif %}
+
+            <div class="center">
+                <button class="button button-red" type="button" onclick="history.go(-1)">Back</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
