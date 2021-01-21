@@ -2,11 +2,18 @@
 ```
 TMS (fr5) 2021 | Diploma project
 ```
-## Used 
+
+## Heroku
+```
+[Heroku]
+```
+
+## Framework 
 - [Django]
 
-[Heroku link]:https://gimmejob.herokuapp.com/
+## State
+```
+Not finished!
+```
 
-```
-Not finished yet!
-```
+[Heroku]:https://gimmejob.herokuapp.com/
