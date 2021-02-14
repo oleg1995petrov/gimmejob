@@ -154,8 +154,8 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 AUTH_USER_MODEL = 'app.User'
 
-EMAIL_HOST = 'smtp.yandex.ru' 
-EMAIL_PORT = 465 
+EMAIL_HOST = '' 
+EMAIL_PORT = '' 
 EMAIL_HOST_USER = ''
 EMAIL_HOST_PASSWORD = '' 
 EMAIL_USE_SSL = True 
