@@ -156,8 +156,8 @@ AUTH_USER_MODEL = 'app.User'
 
 EMAIL_HOST = 'smtp.yandex.ru' 
 EMAIL_PORT = 465 
-EMAIL_HOST_USER = 'oleg1995petrov@yandex.ru'
-EMAIL_HOST_PASSWORD = '577683nomeR' 
+EMAIL_HOST_USER = ''
+EMAIL_HOST_PASSWORD = '' 
 EMAIL_USE_SSL = True 
 
 MEDIA_URL = '/media/'
