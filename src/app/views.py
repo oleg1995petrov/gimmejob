@@ -11,7 +11,7 @@ from django.core.exceptions import ValidationError
 from django.forms import modelformset_factory, formset_factory, inlineformset_factory
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
-from django.utils.encoding import force_bytes, force_text
+from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.utils.translation import gettext_lazy as _
 from django.views import View
@@ -325,7 +325,7 @@ class EditExperienceView(View):
                         if data['end'] and data['begin'] > data['end'] or (
                         not data['end'] and not data['now'] or (
                         data['end'] and data['now'])):
-                            break
+                            continue
                         form.instance.applicant = user.applicant
                         form.save()
                 return redirect('profile', user.id)
@@ -482,11 +482,18 @@ class VacancyView(View):
             vacancy = Vacancy.objects.get(pk=kwargs['vac_id'])
         except Vacancy.DoesNotExist:
             return render(request, 'errors/unexist_vacancy')
-
+    
         if not vacancy.active:
-            vacancy = None
-            return render(request, 'vacancy.html', {'vacancy': vacancy})
-
+            if request.user.is_authenticated:
+                if request.user.company:
+                    if vacancy.employer != request.user.employer:
+                        vacancy = None
+                        return render(request, 'errors/403.html')
+                else:
+                    return render(request, 'errors/403.html')
+            else:
+                return redirect('login')
+            
         #body = vacancy.body.replace('\n', ' < br >', 100)
         context = {
             'user': request.user,
@@ -503,6 +510,55 @@ class VacancyView(View):
     def post(self, request, *args, **kwargs):
         pass
 
+from django.core.paginator import Paginator
+
+class VacancySearchView(View):
+    def get(self, request, *args, **kwargs):
+        try:
+            vacancy = Vacancy.objects.get(pk=kwargs['vac_id'])
+        except Vacancy.DoesNotExist:
+            return render(request, 'errors/unexist_vacancy')
+
+        if not vacancy.active:
+            vacancy = None
+            return render(request, 'vacancy.html', {'vacancy': vacancy})
+
+        # vacancies = Vacancy.objects.all()
+        # paginator = Paginator(vacancies, 10)
+        # page_number = request.GET.get('page')
+        # page_obj = paginator.get_page(page_number)
+        print(vacancy.body)
+        body = vacancy.body
+
+        context = {
+            'user': request.user,
+            'employer': Employer.objects.get(vacancies=vacancy),
+            'vacancy': vacancy,
+            'body': body,
+            'vac_id': vacancy.id,
+            'company': vacancy.employer.user.company,
+            'company_id': vacancy.employer.user.id
+        }
+
+        return render(request, 'vacancy.html', context)
+
+    def post(self, request, *args, **kwargs):
+        pass
+
+
+
+# from django.views.generic.detail import DetailView
+
+
+# class VacancyListView(ListView):
+#     model = Article
+#     paginate_by = 100  # if pagination is desired
+
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['now'] = timezone.now()
+#         return context
+
 
 # CRUD PERMISSIONS *(PRIME)
 # content_type = ContentType.objects.get_for_model(Vacancy)
@@ -518,8 +574,8 @@ class LoginView(View):
     def get(self, request, *args, **kwargs):
         next = request.GET.get('next')
         if next:
-            return render(request, 'login.html', {'form': MyAuthenticationForm(), 'next': next})
-        return render(request, 'login.html', {'form': MyAuthenticationForm()})
+            return render(request, 'login.html', {'form': AuthenticationForm(), 'next': next})
+        return render(request, 'login.html', {'form': AuthenticationForm()})
 
     def post(self, request, *args, **kwargs):
         username = request.POST['username']
@@ -531,10 +587,8 @@ class LoginView(View):
                 login(request, user)
                 next = request.POST.get('next')
                 if next:
-                    current_site = get_current_site(request)
-                    print(current_site)
-                    domain = request.get_host()
-                    return redirect(f"{domain}{next}")
+                    #domain = request.get_host()
+                    return redirect(next)
                 return redirect('profile', user.id)
         if username_exist:
             messages.error(request, 'Invalid password')
@@ -553,11 +607,11 @@ class PasswordChangeView(View):
     def get(self, request):
         if request.user.is_authenticated:
             user = User.objects.get(pk=request.user.id)
-            return render(request, 'password/change/change.html', {'form': MyPasswordChangeForm(user)})
+            return render(request, 'password/change/change.html', {'form': PswdChangeForm(user)})
         return redirect('login')
 
     def post(self, request):
-        form = MyPasswordChangeForm(request.user, request.POST)
+        form = PswdChangeForm(request.user, request.POST)
         if form.is_valid():
             user = form.save()
             update_session_auth_hash(request, user)
@@ -571,10 +625,10 @@ class PasswordChangeView(View):
 
 class PasswordResetView(View):
     def get(self, request):
-        return render(request, 'password/reset/reset.html', {'form': MyPasswordResetForm()})
+        return render(request, 'password/reset/reset.html', {'form': PasswordResetForm()})
 
     def post(self, request):
-        form = MyPasswordResetForm(request.POST)
+        form = PasswordResetForm(request.POST)
         if form.is_valid():
             user_email = form.cleaned_data['email']
             try:
@@ -583,23 +637,19 @@ class PasswordResetView(View):
                 messages.error(request, 'Invalid email')
                 return redirect('password_reset')
             
-            context = {
-                "user": user, 
-                'domain': request.get_host(),
-                "uid": urlsafe_base64_encode(force_bytes(user.id)),
-                'token': default_token_generator.make_token(user),
-                'protocol': 'https://'
-            }
+            domain = request.get_host()
+            uid = urlsafe_base64_encode(force_bytes(user.id))
+            token = default_token_generator.make_token(user)
 
             url = reverse(
-                'password_reset_completed', 
+                'password_reset_complete', 
                 kwargs={
-                    'uidb64': context['uid'],
-                    'token': context['token']
+                    'uidb64': uid,
+                    'token': token
                 }
             )
 
-            link = f"{context['protocol']}{context['domain']}{url}"
+            link = f'https://{domain}{url}'
             subject = "Password Reset Instruction"
             message = f"To reset your password click at this link:\n{link}"
             send_mail(
@@ -621,12 +671,12 @@ class PasswordResetLinkView(View):
         return render(request, 'password/reset/link.html')
 
 
-class PasswordResetCompletedView(View):
-    def get(self, request, *args, **kwargs):
+class PasswordResetCompleteView(View):
+    def get(self, request, uidb64, token, *args, **kwargs):
         try:
-            user_id = force_text(urlsafe_base64_decode(kwargs['uidb64']))
+            user_id = int(force_str(urlsafe_base64_decode(uidb64)))
             user = User.objects.get(pk=user_id)
-            if not default_token_generator.check_token(user, kwargs['token']):
+            if not default_token_generator.check_token(user, token):
                 messages.error(request, 'Invalid link, get a new one')
                 return redirect('password_reset')
         except User.DoesNotExist:
@@ -634,24 +684,24 @@ class PasswordResetCompletedView(View):
             return redirect('password_reset')
         
         context = {
-            'form': MyPasswordSetForm(user),
+            'form': PasswordSetForm(user),
             'uidb64': kwargs['uidb64'], 
             'token': kwargs['token']
         }
         return render(request, 'password/reset/set.html', context)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, uidb64, token, *args, **kwargs):
         try:
-            user_id = force_text(urlsafe_base64_decode(kwargs['uidb64']))
+            user_id = force_text(urlsafe_base64_decode(uidb64))
             user = User.objects.get(pk=user_id)
         except User.DoesNotExist:
             messages.error(request, 'Invalid email')
             return redirect('password_reset')
         
-        form = MyPasswordSetForm(user, request.POST)
+        form = PasswordSetForm(user, request.POST)
         if form.is_valid():
             form.save()
-            return render(request, 'password/reset/completed.html')
+            return render(request, 'password/reset/complete.html')
 
         for error in form.errors:
             messages.error(request, form.errors[error])

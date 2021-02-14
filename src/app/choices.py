@@ -10,7 +10,8 @@ YEAR_MIN_WORK = YEAR_NOW - 60
 WORK_YEARS = [year for year in range(YEAR_NOW, YEAR_MIN_WORK, -1)]
 
 LOCATION = [
-    (_('Belarus'), (
+    (None, '------------'),
+    (('Belarus'), (
         ('Brest', _('Brest')),
         ('Grodno', _('Grodno')),
         ('Gomel', _('Gomel')),
@@ -46,22 +47,23 @@ LOCATION = [
 ]
 
 LANGUAGES = [
-    ('russian', _('Russian')),
-    ('belarussian', _('Belorussian')),
-    ('english', _('English')),
-    ('ukrainian', _('Ukrainian')),
-    ('lithuanian', _('Lithuanian')),
-    ('latvian', _('Latvian')),
-    ('polish', _('Polish')),
-    ('estonian', _('Estonian')),
-    ('german', _('German')),
-    ('french', _('French')),
-    ('spanish', _('Spanish')),
-    ('chinese', _('Chinese')),
-    ('japanese', _('Japanese'))
+    ('Russian', _('Russian')),
+    ('Belarussian', _('Belarussian')),
+    ('English', _('English')),
+    ('Ukrainian', _('Ukrainian')),
+    ('Lithuanian', _('Lithuanian')),
+    ('Latvian', _('Latvian')),
+    ('Polish', _('Polish')),
+    ('Estonian', _('Estonian')),
+    ('German', _('German')),
+    ('French', _('French')),
+    ('Spanish', _('Spanish')),
+    ('Chinese', _('Chinese')),
+    ('Japanese', _('Japanese'))
 ]
 
 COUNTRIES = [
+    (None, '------------'),
     ('Republic of Belarus', 'Republic of Belarus'),
     ('Russian Federation', 'Russian Federation'),
     ('Ukraine', 'Ukraine'),
@@ -72,7 +74,7 @@ COUNTRIES = [
 ]
 
 SKILLS = [
-    ('driving_licence_b', _('Driving licence B')),
+    ('driving licence B', _('Driving licence B')),
     ('strees_tolerance', _('Stress tolerance')),
     ('ms_office', _('MS Office')),
     ('grammatically_correct_speech', _('Grammatically correct speech')),
@@ -83,53 +85,55 @@ SKILLS = [
 ]
 
 SPHERES = [
-    ('energetics', _('Energetics')),
-    ('financial_sector', _('Financial sector')),
-    ('chemical_industry', _('The chemical industry')),
-    ('art', _('Art and culture')),
-    ('education', _('Education')),
-    ('medecine', _('Medicine')),
-    ('retail', _('Retail')),
-    ('car_business', _('Car business')),
-    ('it', _('Information Technology'))
+    ('Energetics', _('Energetics')),
+    ('Financial_sector', _('Financial sector')),
+    ('Chemical_industry', _('The chemical industry')),
+    ('Art and culture', _('Art and culture')),
+    ('Education', _('Education')),
+    ('Medecine', _('Medicine')),
+    ('Retail', _('Retail')),
+    ('Car_business', _('Car business')),
+    ('IT', _('IT'))
 ]
 
 EDUCATION = [
-    ('high school', _('Hight school diploma')),
-    ('associate', _("Associate’s degree")),
-    ('bachelor', _("Bachelor’s degree")),
-    ('master', _("Master’s degree")),
-    ('doctoral', _('Doctoral degree'))
+    (None, '------------'),
+    ('High school', _('Hight school diploma')),
+    ('Associate', _("Associate’s degree")),
+    ('Bachelor', _("Bachelor’s degree")),
+    ('Master', _("Master’s degree")),
+    ('Doctoral', _('Doctoral degree'))
 ]
 
 SPECIALIZATION = [
-    ('economist', _('Economist')),
-    ('lawyer', _('Lawyer')),
-    ('engineer', _('Engineer')),
-    ('architect', _('Architect')),
-    ('teacher', _('Teacher')),
-    ('driver', _('Driver')),
-    ('cook', _('Cook')),
-    ('seller', _('Seller')),
-    ('manager', _('Manager'))
+    (None, '------------'),
+    ('Economist', _('Economist')),
+    ('Lawyer', _('Lawyer')),
+    ('Engineer', _('Engineer')),
+    ('Architect', _('Architect')),
+    ('Teacher', _('Teacher')),
+    ('Driver', _('Driver')),
+    ('Cook', _('Cook')),
+    ('Seller', _('Seller')),
+    ('Manager', _('Manager'))
 ]
 
 NEED_EXP = [
-    ('not_required', _('No experience')),
-    ('1-3_years', _('From 1 to 3 years')),
-    ('1-6_years', _('From 3 to 6 years')),
-    ('over_6_years', _('Over 6 years'))
+    ('Not required', _('No experience')),
+    ('1-3 years', _('From 1 to 3 years')),
+    ('1-6 years', _('From 3 to 6 years')),
+    ('Over 6 years', _('Over 6 years'))
 ]
 
 EMPLOYMENT = [
-    ('full_time', _('Full-time')),
-    ('part_time', _('Part-time')),
-    ('traineeship', _('Traineeship'))
+    ('Full-time', _('Full-time')),
+    ('Part-time', _('Part-time')),
+    ('Traineeship', _('Traineeship'))
 ]
 
 SCHEDULE = [
-    ('full', _('Full day')),
-    ('shift', _('Shift work')),
-    ('flexible ', _('Flexible schedule')),
-    ('remote', _('Remote work'))
+    ('Full day', _('Full day')),
+    ('Shift work', _('Shift work')),
+    ('Flexible schedule', _('Flexible schedule')),
+    ('Remote work', _('Remote work'))
 ]

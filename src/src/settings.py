@@ -46,11 +46,14 @@ INSTALLED_APPS = [
     'crispy_forms',
     'six',
     'multiselectfield',
+    'ckeditor',
+
 ]
 
 MIDDLEWARE = [
     'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -96,6 +99,15 @@ DATABASES = {
     }
 }
 
+CKEDITOR_BASEPATH = "/static/ckeditor/ckeditor/"
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 400,
+        'width': 800,
+    },
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -144,8 +156,8 @@ AUTH_USER_MODEL = 'app.User'
 
 EMAIL_HOST = 'smtp.yandex.ru' 
 EMAIL_PORT = 465 
-EMAIL_HOST_USER = 'some email'
-EMAIL_HOST_PASSWORD = 'some password' 
+EMAIL_HOST_USER = 'oleg1995petrov@yandex.ru'
+EMAIL_HOST_PASSWORD = '577683nomeR' 
 EMAIL_USE_SSL = True 
 
 MEDIA_URL = '/media/'

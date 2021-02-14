@@ -6,17 +6,10 @@
     Vacancy adding
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="header-left">
-        <form method="POST" action={% url 'vacancies' user_view.id %}>
-            {% csrf_token %}
+        <form method="POST" action={% url 'vacancies' user_view.id %}>{% csrf_token %}
+            {{ form.media }}
             <h2>Vacancy adding</h2><hr>
 
             <div class="form-row">

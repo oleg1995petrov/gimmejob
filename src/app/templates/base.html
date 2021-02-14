@@ -9,18 +9,37 @@
     <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png"> 
     <link rel="stylesheet" href="{% static 'css/main.css' %}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+        <!-- <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script> -->
 </head>
 <body>
     <aside>
-        {% block aside %}{% endblock %}
+        {% if request.user.is_authenticated and request.user.applicant %}
+            <ul>
+                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+                <!-- <a href=""><li><i class="fas fa-business-time"></i>Jobs</li></a> -->
+            </ul>
+        {% endif %}
+        {% if request.user.is_authenticated and request.user.employer %}
+            <ul>
+                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+                <!-- <a href=""><li><i class="fas fa-business-time"></i>CVs</li></a> -->
+            </ul> 
+        {% endif %}
+        {% if not request.user.is_authenticated %}
+            <ul>
+                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
+            </ul>
+        {% endif %}
     </aside>
     
     <main>
         {% if request.user.is_authenticated %}
+        <div class="topbar">
             <ul class="topbar-ul">
                 <a href="{% url 'logout' %}"><li class="topbar-li"><i class="fas fa-lock"></i>Log out</li></a> 
                 <a href="{% url 'profile' request.user.id %}"><li class="topbar-li"><i class="fas fa-user-circle"></i>My profile</li></a> 
             </ul>
+        </div>
         {% else %}
             <ul class="topbar-ul"> 
                 <a href="{% url 'registration' %}"><li class="topbar-li"><i class="fas fa-lock"></i>Sign up</li></a> 

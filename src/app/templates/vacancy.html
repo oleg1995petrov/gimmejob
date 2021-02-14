@@ -6,13 +6,6 @@
     {{ vacancy.position }}
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <h2 class="header">{{ vacancy.position }}
         {% if user.employer == employer %}
@@ -20,12 +13,13 @@
         {% endif %}
     </h2><hr>
 
-    <div class="f1">
-        <h5>from {{ vacancy.salary}} $</h5>
-        <h5><a href="{% url 'profile' company_id %}">{{ company }}</a></h5><br>
-        <h5>{{ vacancy.need_exp }}</h5>
-        <h5>{{ vacancy.employment }}, {{ vacancy.need_exp }}</h5><br>
-        <p>{{ body }}</p>
+    <p>From {{ vacancy.salary}} $</p>
+    <p><a href="{% url 'profile' company_id %}">{{ company }}</a></p><br>
+    <p>Required work experience: {{ vacancy.need_exp }}</p>
+    <p>{{ vacancy.employment }}, {{ vacancy.schedule }}</p><br>
+    <!-- <pre>{{ body }}</pre> -->
+    <div class="vacancy-body">
+        {{ body|safe }}
     </div>
 
     <br><br><hr> 

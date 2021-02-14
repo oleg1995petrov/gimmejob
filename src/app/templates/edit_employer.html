@@ -6,17 +6,10 @@
     Profile editing
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="header-left">
-        <form action={% url 'edit_personal' %} method="POST">
-            {% csrf_token %}
+        <form action={% url 'edit_personal' %} method="POST">{% csrf_token %}
+            {{ profile_form.media }}
             <h2>Basic info</h2><hr>
             <div class="form-row">
                 <div class="form-row-field-2">
@@ -40,7 +33,7 @@
             </div>
 
             <div class="form-row">
-                <p class="checkbox-label">{{ profile_form.company_spheres.label }}<span class=asteriskField>*</span></p>
+                <p class="checkbox-label">{{ profile_form.company_spheres.label }}<!--<span class=asteriskField>*</span></p>-->
                 <div class="form-row-field-checkbox-2">
                     {{ profile_form.company_spheres }}
                 </div>

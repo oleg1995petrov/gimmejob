@@ -6,13 +6,6 @@
     My vacancies
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="header-left">
         <form action={% url 'vacancies' user_view.id %} method="POST">
@@ -22,7 +15,7 @@
                 <div class="text-indent-left">
                     <h5>Active vacancies:</h5>
                     {% for vacancy in active_vacancies %}
-                        <p><a href="{% url 'vacancy' vacancy.id%}">{{ vacancy.position }}</a>&ensp;&#8212;&ensp;
+                        <p><a class="vacancy-a" href="{% url 'vacancy' vacancy.id%}">{{ vacancy.position }}</a>&ensp;&#8212;&ensp;
                             <a class="action-link" href="{% url 'vacancies' user.id%}?delete=1&vac_id={{ vacancy.id }}">delete vacancy</a></p>
                     {% endfor %}
                 </div>

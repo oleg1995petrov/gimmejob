@@ -2,23 +2,17 @@
 {% load static %}
 
 {% block title %}
-    Home page
-{% endblock %}
-
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
+    Home
 {% endblock %}
 
 {% block content %}
     <div class="header">
         {% if request.user.is_authenticated %}
-            <h2>Welcome to your dashboard</h2><hr>
+            <h2>My dashboard</h2><hr>
         {% else %}
-            <h3>You are Welcome! Make yourself at home, traveler.</h3><hr>
-            <p class="f1">To use all the features of our service, you must log into your account.</p>
+            <h3>Make yourself at home, traveler.</h3><hr>
+            <h5 >To use all the features of the service, you must be logged into your account.</h5>
+            <h5><a href="{% url 'login' %}">Do it easy!</a></h5> 
         {% endif %}
     </div>
 {% endblock %}

@@ -6,17 +6,9 @@
     Experience editing
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="header-left">
-        <form action={% url 'edit_experience' %} method="POST">
-            {% csrf_token %}
+        <form action={% url 'edit_experience' %} method="POST">{% csrf_token %}
             <h2>Work experience</h2><hr>
             {{ forms.management_form }}
             {% for form in forms%}

@@ -3,14 +3,7 @@
 {% load crispy_forms_tags %}
 
 {% block title %}
-    Login page
-{% endblock %}
-
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
+    Login
 {% endblock %}
 
 {% block content %}
@@ -21,7 +14,11 @@
         <br>
         <form class="form" method="post" action="{% url 'login' %}">
             {% csrf_token %}
-            <div class="form-row">
+            <div class="form-row-field-1">
+                {{ form.as_p }}
+            </div>
+            
+            <!-- <div class="form-row">
                 <div class="form-row-field-1">
                     {{ form.username|as_crispy_field }}
                 </div>
@@ -30,7 +27,8 @@
                 <div class="form-row-field-1">
                     {{ form.password|as_crispy_field }}
                 </div>
-            </div>
+            </div> -->
+            <br>
             <input type="hidden" name="next" value="{{ next }}">
             <button class="button button-green" type="submit">Log in</button><br class="forgot-password">
             <a href="{% url 'password_reset' %}">Forgot password?</a>

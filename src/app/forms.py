@@ -4,6 +4,7 @@ from django.contrib.auth.forms import (
     ReadOnlyPasswordHashField, PasswordChangeForm, SetPasswordForm, 
     UserCreationForm, AuthenticationForm, PasswordResetForm
 )
+from ckeditor.widgets import CKEditorWidget
 
 from .models import User, Applicant, Employer, Experience, Vacancy
 from .choices import *
@@ -53,6 +54,8 @@ class ApplicantEditForm(forms.ModelForm):
 class ApplicantProfileForm(forms.ModelForm):
     birthday = forms.DateField(label='', widget=forms.SelectDateWidget(years=YEARS)) 
     photo = forms.ImageField(required=False, widget=forms.FileInput, label='Your photo')
+    location = forms.CharField(widget=forms.Select(choices=LOCATION), required=False)
+    citizenship = forms.CharField(widget=forms.Select(choices=COUNTRIES), required=False)
 
     class Meta:
         model = Applicant
@@ -68,7 +71,8 @@ class PhotoForm(forms.ModelForm):
 
 
 class EducationForm(forms.ModelForm):
-    education = forms.CharField(widget=forms.Select(choices=EDUCATION), label='Degree')
+    education = forms.CharField(widget=forms.Select(choices=EDUCATION), label='Degree', required=False)
+    specialization = forms.CharField(widget=forms.Select(choices=SPECIALIZATION), required=False)
 
     class Meta:
         model = Applicant
@@ -84,7 +88,7 @@ class ExperienceForm(forms.ModelForm):
     company_site = forms.URLField(label='Site', required=False)
     company_spheres = forms.MultipleChoiceField(choices=SPHERES, widget=forms.CheckboxSelectMultiple(), label='Scopes of the company')
     position = forms.ChoiceField(choices=SPECIALIZATION)
-    responsibilities = forms.CharField(widget=forms.Textarea, label='Workplace responsibilities')
+    responsibilities = forms.CharField(widget=CKEditorWidget(), label='Workplace responsibilities')
 
     class Meta:
         model = Experience
@@ -198,19 +202,15 @@ class EmployerProfileForm(forms.ModelForm):
 
     company_info = forms.CharField(
         required=False,
-        label='', 
-        widget=forms.Textarea(
-            attrs={
-                'placeholder': 'About company'
-            }
-        )
+        label='About the company:', 
+        widget=CKEditorWidget()
     )
 
     company_spheres = forms.MultipleChoiceField(
         required=False,
         choices=SPHERES, 
         widget=forms.CheckboxSelectMultiple(), 
-        label='Scopes of the company'
+        label='Company scopes'
     )
 
     class Meta:
@@ -220,7 +220,7 @@ class EmployerProfileForm(forms.ModelForm):
 
 class VacancyForm(forms.ModelForm):
     salary = forms.IntegerField(required=False)
-    body = forms.CharField(widget=forms.Textarea(), label='Vacancy description')
+    body = forms.CharField(widget=CKEditorWidget(), label='Description')
     need_exp = forms.ChoiceField(choices=NEED_EXP, label='Requared work experience')
     employment = forms.MultipleChoiceField(
         choices=EMPLOYMENT,
@@ -238,7 +238,7 @@ class VacancyForm(forms.ModelForm):
 
 # PASSWORD 
 
-class MyAuthenticationForm(AuthenticationForm):
+class AuthenticationForm(AuthenticationForm):
     username = forms.CharField(
         label='', 
         widget=forms.TextInput(
@@ -248,6 +248,7 @@ class MyAuthenticationForm(AuthenticationForm):
             }
         )
     )
+    
     password = forms.CharField(
         label='', 
         strip=False, 
@@ -260,7 +261,7 @@ class MyAuthenticationForm(AuthenticationForm):
     )
 
 
-class MyPasswordChangeForm(PasswordChangeForm):
+class PasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
         label='',
         strip=False,
@@ -272,6 +273,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
             }
         )
     )
+
     new_password1 = forms.CharField(
         label='', 
         strip=False,
@@ -282,6 +284,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
             }
         )
     )
+
     new_password2 = forms.CharField(
         label='',
         strip=False,
@@ -294,7 +297,7 @@ class MyPasswordChangeForm(PasswordChangeForm):
     )
 
 
-class MyPasswordResetForm(PasswordResetForm):
+class PasswordResetForm(PasswordResetForm):
     email = forms.EmailField(
         label='', 
         widget=forms.TextInput(
@@ -305,7 +308,7 @@ class MyPasswordResetForm(PasswordResetForm):
     )
 
 
-class MyPasswordSetForm(SetPasswordForm):
+class PasswordSetForm(SetPasswordForm):
     password1 = forms.CharField(
         label='New password', 
         strip=False, 
@@ -316,6 +319,7 @@ class MyPasswordSetForm(SetPasswordForm):
             }
         )
     )
+
     password2 = forms.CharField(
         label='New password again', 
         strip=False, 

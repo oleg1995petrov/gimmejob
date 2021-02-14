@@ -81,7 +81,9 @@ class Employer(models.Model):
     photo = models.ImageField(upload_to='employers/%Y/%m/%d')
     company_email = models.EmailField(null=True)
     company_site = models.URLField(null=True)
-    company_info = models.TextField(default='')
+    company_info = models.TextField(
+        default='Something about the company. History, goals, missions, values, features, advantages, etc.'
+    )
     company_spheres = MultiSelectField(choices=SPHERES, null=True)
 
     def __str__(self):
@@ -123,4 +125,3 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return f'{self.employer.user.company} {self.position}'
-

@@ -6,19 +6,15 @@
     Applicant
 {% endblock %}
 
-{% block aside %}
-    <ul>
-        <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a> 
-        <a href=""><li><i class="fas fa-business-time"></i>Vacancies</li></a>
-    </ul>
-{% endblock %}
-
 {% block content %}
     <div class="header">
         <h2>Create an applicant account</h2><hr>          
         <form action="{% url 'registration_applicant' %}" method="POST">
             {% csrf_token %}
-            <div class="form-row">
+            <div class="form-row-field-1">
+                {{ form.as_p }}
+            </div>
+            <!-- <div class="form-row">
                 <div class="form-row-field-1">{{ form.first_name|as_crispy_field }}</div>
             </div>
 
@@ -36,7 +32,7 @@
 
             <div class="form-row">
                 <div class="form-row-field-1">{{ form.password2|as_crispy_field }}</div>
-            </div>
+            </div> -->
 
             <div class="hint">
                 <p>Your password can’t be too similar to your other personal information.</p> 
@@ -45,6 +41,7 @@
                 <p>Your password can’t be entirely numeric.</p>
             </div><br>
 
+            <button class="button button-red" type="button" onclick="history.go(-1)">Back</button>
             <button class="button button-green" type="submit">Create</button>
         </form>
     </div>
