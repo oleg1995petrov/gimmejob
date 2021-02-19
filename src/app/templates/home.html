@@ -9,10 +9,10 @@
     <div class="header">
         {% if request.user.is_authenticated %}
             <h2>My dashboard</h2><hr>
+            <p>In developing</p>
         {% else %}
-            <h3>Make yourself at home, traveler.</h3><hr>
-            <h5 >To use all the features of the service, you must be logged into your account.</h5>
-            <h5><a href="{% url 'login' %}">Do it easy!</a></h5> 
+            <h2>Test</h2><hr>
+            <p>In dveloping</p>
         {% endif %}
     </div>
 {% endblock %}

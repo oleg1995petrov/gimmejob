@@ -118,7 +118,6 @@ class Vacancy(models.Model):
     schedule = MultiSelectField(max_length=100, choices=SCHEDULE)
     salary = models.PositiveSmallIntegerField(null=True)
     body = models.TextField()
-    # body = models.FileField()
     
     class Meta:
         ordering = ['-published']

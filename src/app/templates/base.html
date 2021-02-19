@@ -1,4 +1,5 @@
 {% load static %}
+
 <!DOCTYPE html>
 <html lang="en-us">
 <head>
@@ -11,56 +12,52 @@
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
         <!-- <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script> -->
 </head>
-<body>
+<body>    
+    <div class="head">
+        <nav class="nav_left">
+            <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i>Home</a>
+        </nav>
+
+        <nav class="nav_right">
+        {% if request.user.is_authenticated %}
+            <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-lock"></i>Log out</a>
+        {% else %}
+            <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-user-circle"></i>Log in</a>
+            <a class="nav-link" href="{% url 'registration' %}"><i class="fas fa-lock"></i>Sign up</a>
+        {% endif %}
+        </nav>
+    </div>        
+
     <aside>
         {% if request.user.is_authenticated and request.user.applicant %}
-            <ul>
-                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-                <!-- <a href=""><li><i class="fas fa-business-time"></i>Jobs</li></a> -->
-            </ul>
+            <nav class="nav_aside">
+                <a class="nav-link" href="{% url 'profile' request.user.id %}"><i class="fas fa-user-circle"></i>My profile</a>
+                <a class="nav-link" href=""><i class="fas fa-home"></i>Job responses</a>
+            </nav>
         {% endif %}
         {% if request.user.is_authenticated and request.user.employer %}
-            <ul>
-                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-                <!-- <a href=""><li><i class="fas fa-business-time"></i>CVs</li></a> -->
-            </ul> 
+            <nav class="nav_aside">
+                <a class="nav-link" href="{% url 'profile' request.user.id %}"><i class="fas fa-user-circle"></i>My profile</a>
+                <a class="nav-link" href=""><i class="fas fa-home"></i>Vacancy responses</a>
+            </nav> 
         {% endif %}
         {% if not request.user.is_authenticated %}
-            <ul>
-                <a href="{% url 'home' %}"><li><i class="fas fa-home"></i>Home</li></a>
-            </ul>
+            <nav class="nav_aside">
+            
+            </nav>
         {% endif %}
     </aside>
-    
-    <main>
-        {% if request.user.is_authenticated %}
-        <div class="topbar">
-            <ul class="topbar-ul">
-                <a href="{% url 'logout' %}"><li class="topbar-li"><i class="fas fa-lock"></i>Log out</li></a> 
-                <a href="{% url 'profile' request.user.id %}"><li class="topbar-li"><i class="fas fa-user-circle"></i>My profile</li></a> 
-            </ul>
-        </div>
-        {% else %}
-            <ul class="topbar-ul"> 
-                <a href="{% url 'registration' %}"><li class="topbar-li"><i class="fas fa-lock"></i>Sign up</li></a> 
-                <a href="{% url 'login' %}"><li class="topbar-li"><i class="fas fa-user-circle"></i>Log in</li></a> 
-            </ul>
-        {% endif %}
         
+    <main>       
         {% if messages %}
             <ul class="messages">
-                {% for message in messages %}
-                    <li class="messages {{ message.tags }}">{{ message }}</li>  
-                {% endfor %}
+            {% for message in messages %}
+                <li class="messages {{ message.tags }}">{{ message }}</li>  
+            {% endfor %}
             </ul>
         {% endif %}
-
         {% block content %}{% endblock %}
-        <br><br><br><br><br><br><br><br><br><br>
-        <div class="center">
-        <!-- <a href="https://github.com/oleg1995petrov"><button class="button button-other">Author's Github</button></a> -->
-        </div>
-        <br>
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
     </main>
 </body>
 </html

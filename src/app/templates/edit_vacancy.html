@@ -13,9 +13,8 @@
             <h2>Vacancy editing</h2><hr>
 
             <div class="form-row">
-                <p class="checkbox-label">{{ form.active.label }}<span class=asteriskField>*</span></p>
                 <div class="form-row-field-checkbox">
-                    {{ form.active }}
+                    {{ form.active | as_crispy_field }}
                 </div>
             </div>
             

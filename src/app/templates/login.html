@@ -9,25 +9,11 @@
 {% block content %}
     <div class="header">
         <h2>Use the following form to log in</h3><hr>
-        <h5>If you don't have an account
-            <a href="{% url 'registration' %}">register here.</a></h5>
-        <br>
         <form class="form" method="post" action="{% url 'login' %}">
             {% csrf_token %}
             <div class="form-row-field-1">
                 {{ form.as_p }}
             </div>
-            
-            <!-- <div class="form-row">
-                <div class="form-row-field-1">
-                    {{ form.username|as_crispy_field }}
-                </div>
-            </div>
-            <div class="form-row">
-                <div class="form-row-field-1">
-                    {{ form.password|as_crispy_field }}
-                </div>
-            </div> -->
             <br>
             <input type="hidden" name="next" value="{{ next }}">
             <button class="button button-green" type="submit">Log in</button><br class="forgot-password">

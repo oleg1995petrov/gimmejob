@@ -59,7 +59,7 @@
                     <p>{{ user_view.applicant.birthday }}</p>
                 {% endif %}
 
-                <p>{{ user_view.email }}</p>
+                <p><a href="mailto:{{ user_view.email }}">{{ user_view.email }}</a></p>
 
                 {% if user_view.applicant.location %}
                     <p>{{ user_view.applicant.location }}</p>
@@ -69,7 +69,6 @@
                     <p>{{ user_view.applicant.citizenship }}</p>
                 {% endif %}
             </div>
-
         </div>
         {% if user == user_view %}
             <a href="{% url 'edit_photo' %}"><button class="button button-other" type="submit">Change</button></a>
@@ -119,8 +118,6 @@
                     <a class="action-link" href="{% url 'edit_experience' %}">
                         <input type="button" class="button button-edit" value="Edit"></a>
                 {% endif %}
-
-               
             {% endif %}
         </h4><hr>
         
@@ -154,12 +151,11 @@
                 {% endif %}
             {% endfor %}
 
-
         <h4>Skills 
             {% if user == user_view %}
                 <!-- <a class="action-link" href="{% url 'edit_skills' %}">Edit</a> -->
                 <a class="action-link" href="{% url 'edit_skills' %}">
-                    <input type="button" class="button button-edit" value="Edit"></a>
+                    <button type="button" class="button button-edit">Edit</button></a>
             {% endif %}
         </h4><hr>
 
@@ -191,13 +187,13 @@
 <!-- EMPLOYER -->
 
         <div class="header">
-            <h2>{{ user_view.company }}
+            <h3>{{ user_view.company }}
             {% if user == user_view %}
                 <!-- <a class="action-link" href="{% url 'edit_personal' %}">Edit</a> -->
                 <a class="action-link" href="{% url 'edit_personal' %}">
                     <input type="button" class="button button-edit" value="Edit"></a>
             {% endif %}
-            </h2><hr>
+            </h3><hr>
         </div>
 
         {% if user_view.employer.photo %}
@@ -222,7 +218,7 @@
         {% if user_view.employer.company_info %}
             <h4>About</h4><hr>
             <div class="value-without-property">
-                {{ user_view.employer.company_info }}
+                {{ user_view.employer.company_info | safe }}
             </div>
         {% endif %}
 
@@ -233,7 +229,7 @@
                         <p>Web site:</p>  
                     </div> 
                     <div class="value">
-                        <p><a class="link" href="{{ user_view.employer.company_site }}">{{ user_view.employer.company_site }}</a>.</p>
+                        <p><a class="link" href="{{ user_view.employer.company_site }}">{{ user_view.employer.company_site }}</a></p>
                     </div>
                 </div>
             {% endif%}
@@ -244,21 +240,21 @@
                         <p>Email:</p>
                     </div>
                     <div class="value">
-                        <p>{{ user_view.employer.company_email }}</p>
+                        <a href="mailto:{{ user_view.employer.company_email }}">{{ user_view.employer.company_email }}</a>
                     </div>
                 </div>
             {% endif%}
         
         {% if user == user_view %}
-            <h4><a href="{% url 'vacancies' user.id %}">Vacancies</a></h4><hr>
+            <h4><a href="{% url 'vacancies' user.id %}">Comapny vacancies</a></h4><hr>
         {% else %}
-            <h4>Vacancies</h4><hr>
+            <h5>Comapny vacancies</h5><hr>
         {% endif %}
         
         {% if active_vacancies %}
             <p class="f1">Vacancies: {{ active_vacancies_count }}</p>
             {% for vacancy in active_vacancies %}
-                <p class="text-indent-left"><a class="vacancy-a" href="{% url 'vacancy' vacancy.id %}">{{ vacancy.position }}</a></p>
+                <p class="value-without-property"><a class="vacancy-link" href="{% url 'vacancy' vacancy.id %}">{{ vacancy.position }}</a></p>
             {% endfor %}
         {% else %}
             {% if user != user_view %}
@@ -271,7 +267,7 @@
                     <p>The company didn't post information about open vacancies.</p>   
                 {% else %}
                     {% for vacancy in inactive_vacancies %}
-                        <p class="text-indent-left"><a class="vacancy-a" href="{% url 'vacancy' vacancy.id %}">
+                        <p class="text-indent-left"><a class="vacancy-link" href="{% url 'vacancy' vacancy.id %}">
                             {{ vacancy.position }}</a></p>
                     {% endfor %}
                 {% endif%}

@@ -1,24 +1,34 @@
 body {
+    /* background: url(../images/bg.jpeg) no-repeat center center fixed; */
     background-size: cover;
     background: rgb(236, 236, 236);
     font-family: Arial, Helvetica, sans-serif;
 }
 
 aside {
+    display: flex;
     float: left;
-    width: 26.5%;
-    font-size: 18px;
+    width: 100%;
+    height: 100%;
+    max-height: 100vh;
+    max-width: 26.5%;
 }
 
 main {
     float: left;
-    width: 58.7%;
+    width: 100%;
+    max-width: 58.7%;
     font-size: 14px;
+}
+
+nav {
+    font-size: 15px;
 }
 
 aside ul {
     display: block;
-    padding-top: 130px;
+    /* padding-top: 130px; */
+    /* padding-top: 23%; */
     list-style: none;
 
 }
@@ -26,36 +36,14 @@ aside ul {
 aside li {
     color: black;
     display: block;
-    margin-top: 15px;
-    margin-left: 150px;
+    /* margin-top: 10px; */
+    /* margin-left: 120px; */
     list-style: none;
 }
 
-main li {
+main ul, li {
     list-style: none;
 }
-
-main ul {
-    list-style: none;
-}
-
-.topbar-ul {
-    display: inline;
-}
-
-.topbar-li {
-    display: inline;
-    color: black;
-    margin-top: 20px;
-    margin-left: 50px;
-    font-size: 18px;
-    float: right;
-}
-
-.topbar-li:hover {
-    background: rgb(228, 225, 225);
-    border-radius: 8px;
-}   
 
 aside li:hover {
     background: rgb(228, 225, 225);
@@ -67,44 +55,16 @@ aside a:hover {
     text-decoration: none;
 }
 
-a:hover {
-    /* color:red; */
-}
-
-.vacancy-a  {
-    border-bottom: 1px dashed #0099ff;
-}
-
-.vacancy {
-    padding-left: 40px;
-    text-align: justify;
-}
-
-.vacancy-a:hover {
-    text-decoration: none;
-    border-bottom: 1px dashed red;
-    color:red;
-}
-
-aside i {
-    margin-right: 15px;
-    /* color: red; */
-    color: #0099ff;
-    /* color: rgb(107, 107, 202); */
-    font-size: 18px;
-}
-
-main i {
+nav i {
     margin-right: 5px;
     color: #0099ff;
-    /* color: rgb(107, 107, 202); */
-    font-size: 18px;
+    font-size: 15px;
 }
 
 hr {
     background-color: red;
     margin-top: 0px;
-    opacity: .4;
+    opacity: .5;
 }
 
 main h1, h2, h3, h4 {
@@ -120,14 +80,95 @@ p {
 }
 
 pre {
-    /* background-color: rgba(161, 245, 196, 0.692); */
     width: auto;
-    white-space: pre-wrap;
     font-style: oblique;
+    font-size: 13px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+@media (max-width: 1200px) {
+    main{
+        max-width: 970px;
+    }
+}
+
+@media (max-width: 992px) {
+    main{
+        max-width: 750px;
+    }
+}
+
+@media (max-width: 767px) {
+    main{
+        max-width: none;
+    }
+} 
+
+.head {
+    display: flex;
+    background-color: #fff;
+    width: 100%;
+    height: 100%;
+    position: sticky;
+    top: 0px;
+    color: #000;
+    max-width: 100%;
+    max-height: 70px;
+    font-size: 16px;
+    z-index: 1;
+}
+
+.nav_left {
+    display: flex;
+    width: 100%;
+    height: 100%; 
+    max-width: 100%;
+    max-height: 70px;
+    padding: 0 0 0 180px;
+    justify-content: left;
+}
+
+.nav_right {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    max-width: 100%;
+    max-height: 70px;
+    justify-content: right;
+    padding: 0 14.8%;
+}
+
+.nav_aside {
+    display: inline-block;
+    padding: 100px 0 0 150px;
+}
+
+.nav-link {
+    color: #000;
+}
+
+.nav-link:hover {
+    background: rgb(228, 225, 225);
+    border-radius: 8px;
+}   
+
+.vacancy-link {
+    border-bottom: 1px dashed #0099ff;
+}
+
+.vacancy {
+    padding-left: 40px;
+    text-align: justify;
+}
+
+.vacancy-link:hover {
+    text-decoration: none;
+    border-bottom: 1px dashed red;
+    color:red;
 }
 
 .checkbox-label {
-    padding-left: 60px; 
+    padding: 20px 0 0 75px; 
     padding-bottom: 10px;
 }
 
@@ -159,38 +200,28 @@ pre {
 }
 
 .header {
-    margin-top: 75px; 
+    margin-top: 50px; 
     text-align: center;
 }
 
 .header-left {
-    margin-top: 75px;
+    margin-top: 50px;
     text-align: left; 
 }
-
 
 .content {
     display: block;
 }
 
-.about {
-    display: flex;
-    width: 500px;
-    /* flex-direction: column; */
-    /* flex-wrap: nowrap; */
-}
-
-.text-indent-left {
+/* .text-indent-left {
     display: block;
-    /* vertical-align: top; */
     padding-left: 10px;
     text-align: justify;
-}
+} */
 
 .oneline {
     display: flex;
-    /* width: 770px; */
-    width: 100%;
+    /* width: 100%; */
 }
 
 .property {
@@ -216,7 +247,6 @@ pre {
     padding-left: 10px;
     padding-right: 20px;
     text-align: justify;
-    /* font-style: italic; */
 }
 
 .avatar-applicant {
@@ -226,10 +256,8 @@ pre {
 }
 
 .avatar-applicant img {
-    max-width: 200px;
-    max-height: 267px;
-    /* width: 200px;
-    height: 267px; */
+    max-width: 130px;
+    max-height: 173.33px;
     width: 130px;
     height: 173.33px;
     border-radius: 3px;
@@ -242,8 +270,10 @@ pre {
 }
 
 .avatar-company img {
-    width: 775px;
-    height: 350px;
+    width: 100%;
+    height: 100%;
+    max-width: 775px;
+    min-height: 387.5px;
 }
 
 /* MESSAGES */
@@ -265,38 +295,34 @@ pre {
 
 .form-row {
     display: block;
-    /* font-style: italic; */
-    /* padding-top: 10px; */
-    padding-bottom: 20px;
+    padding: 0 0 10px;    
+}
+
+.form-row-field-checkbox-now {
+    padding: 15px 0 0 75px;
 }
 
 .form-row-field-checkbox {
     display: inline-block;
-    padding-left: 60px;   
-    padding-right: 60px;
+    padding-left: 75px;   
+    /* padding-right: 60px; */
     width: 100%;
     column-count: 1;
 }
 
 .form-row-field-checkbox-2 {
     display: inline-block;
-    padding-left: 60px;   
-    padding-right: 60px;
+    padding: 0 35px 0px;   
     width: 100%;
     column-count: 2;
 }
 
 .form-row-field-checkbox-3 {
     display: inline-block;
-    padding-left: 60px;   
-    padding-right: 60px;
+    /* padding-left: 60px;   
+    padding-right: 60px; */
     width: 100%;
     column-count: 3;
-}
-
-.form-row-field-right {
-    display: inline-block;
-    padding-left: 390px;
 }
 
 .form-row-field-3 {
@@ -306,12 +332,11 @@ pre {
 
 .form-row-field-2 {
     display: inline-block;
-    padding-left: 60px;
+    padding: 0 0 0 75px;
 }
 
 .form-row-field-2 input {
     width: 285px;
-
 }
 
 .form-row-field-1 {
@@ -322,13 +347,7 @@ pre {
     width: 240px;
 }  
 
-.form-row-field-area {
-    display: block;
-    /* padding-left: 60px;	 */
-}
-
 .form-row-field-area textarea{ 
-    /* resize: none; */
     width: 800px;
     height: 200px;
     border-radius: 8px;
@@ -337,7 +356,6 @@ pre {
 
 .asteriskField {
     color: red;
-    height: 10px;
 }
 
 .hint {
@@ -361,12 +379,14 @@ pre {
 }
 
 .button-edit {
-    /* color: white; */
     background: #0099ff; 
-    /* border: 2px solid #0099ff; */
     border-radius: 15px;
     height: 30px;
     width: 60px;    
+}
+
+.button-edit:hover{
+    background:#3cadf8 
 }
 
 .button-other {

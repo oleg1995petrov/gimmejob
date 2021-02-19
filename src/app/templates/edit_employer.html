@@ -11,6 +11,7 @@
         <form action={% url 'edit_personal' %} method="POST">{% csrf_token %}
             {{ profile_form.media }}
             <h2>Basic info</h2><hr>
+
             <div class="form-row">
                 <div class="form-row-field-2">
                     {{ user_form.first_name|as_crispy_field }}
@@ -24,9 +25,7 @@
                 <div class="form-row-field-2">
                     {{ user_form.email|as_crispy_field }}
                 </div>
-            </div>
-
-            <div class="form-row">
+         
                 <div class="form-row-field-2">
                     {{ user_form.company|as_crispy_field }}
                 </div>

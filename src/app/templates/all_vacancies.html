@@ -15,7 +15,7 @@
                 <div class="text-indent-left">
                     <h5>Active vacancies:</h5>
                     {% for vacancy in active_vacancies %}
-                        <p><a class="vacancy-a" href="{% url 'vacancy' vacancy.id%}">{{ vacancy.position }}</a>&ensp;&#8212;&ensp;
+                        <p><a class="vacancy-link" href="{% url 'vacancy' vacancy.id%}">{{ vacancy.position }}</a>&ensp;&#8212;&ensp;
                             <a class="action-link" href="{% url 'vacancies' user.id%}?delete=1&vac_id={{ vacancy.id }}">delete vacancy</a></p>
                     {% endfor %}
                 </div>
@@ -26,7 +26,7 @@
             <div class="text-indent-left">
                 <h5>Inactive vacancies:</h5>
                 {% for vacancy in inactive_vacancies %}
-                    <p><a class="vacancy-a" href="{% url 'vacancies' user.id %}?edit=1&vac_id={{ vacancy.id }}">{{ vacancy.position }}</a> &ensp;&#8212;&ensp;
+                    <p><a class="vacancy-link" href="{% url 'vacancies' user.id %}?edit=1&vac_id={{ vacancy.id }}">{{ vacancy.position }}</a> &ensp;&#8212;&ensp;
                         <a class="action-link" href="{% url 'vacancies' user.id%}?delete=1&vac_id={{ vacancy.id }}">delete vacancy</a></p>
                 {% endfor %}
                 <hr class="hr-grey">

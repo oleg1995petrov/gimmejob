@@ -15,11 +15,21 @@ from .choices import *
 # APPLICANT
 
 class ApplicantCreationForm(forms.ModelForm):
-    first_name = forms.CharField(label='', widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'First name'}))
-    last_name = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
-    email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Email address'}))
-    password1 = forms.CharField(label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}))
-    password2 = forms.CharField(label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password again'}))
+    first_name = forms.CharField(
+        label='', widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'First name'})
+    )
+    last_name = forms.CharField(
+        label='', widget=forms.TextInput(attrs={'placeholder': 'Last name'})
+    )
+    email = forms.EmailField(
+        label='', widget=forms.TextInput(attrs={'placeholder': 'Email address'})
+    )
+    password1 = forms.CharField(
+        label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+    )
+    password2 = forms.CharField(
+        label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password again'})
+    )
 
     class Meta:
         model = User
@@ -80,19 +90,24 @@ class EducationForm(forms.ModelForm):
 
 
 class ExperienceForm(forms.ModelForm):
-    required_css_class = 'required'
+    # required_css_class = 'required'
     begin = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='Beginning of work') 
-    now = forms.BooleanField(label='Till this day', required=False)
+    now = forms.BooleanField(label='To date', required=False)
     end = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='Ending', required=False)
     company = forms.CharField(label='Company')
     company_site = forms.URLField(label='Site', required=False)
-    company_spheres = forms.MultipleChoiceField(choices=SPHERES, widget=forms.CheckboxSelectMultiple(), label='Scopes of the company')
+    company_spheres = forms.MultipleChoiceField(
+        choices=SPHERES, widget=forms.CheckboxSelectMultiple(), label='Scopes of the company'
+    )
     position = forms.ChoiceField(choices=SPECIALIZATION)
     responsibilities = forms.CharField(widget=CKEditorWidget(), label='Workplace responsibilities')
 
     class Meta:
         model = Experience
-        fields = ('begin','now', 'end', 'company', 'company_site', 'company_spheres', 'position', 'responsibilities',)
+        fields = (
+            'begin','now', 'end', 'company', 'company_site', 
+            'company_spheres', 'position', 'responsibilities',
+        )
 
 
 class SkillsForm(forms.ModelForm):
@@ -110,12 +125,22 @@ class LanguagesForm(forms.ModelForm):
 # EMPLOYEER 
 
 class EmployerCreationForm(forms.ModelForm):
-    first_name = forms.CharField(label='', widget=forms.TextInput(attrs={'autofocus': True,'placeholder': 'First name'}))
+    first_name = forms.CharField(
+        label='', widget=forms.TextInput(attrs={'autofocus': True,'placeholder': 'First name'})
+    )
     last_name = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
     email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Email'}))
     company = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Company'}))
-    password1 = forms.CharField(label='', strip=False, widget=forms.PasswordInput(attrs={'placeholder': 'Password'}), min_length=8)
-    password2 = forms.CharField(label='', strip=False, widget=forms.PasswordInput(attrs={'placeholder': 'Password again'}), min_length=8)
+    password1 = forms.CharField(
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'Password'}
+        )
+    )
+    password2 = forms.CharField(
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'Password again'}
+        )
+    )
 
     class Meta:
         model = User
@@ -138,41 +163,10 @@ class EmployerCreationForm(forms.ModelForm):
 
 
 class EmployerEditForm(forms.ModelForm):
-    first_name = forms.CharField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'First name'
-                }
-            )
-        )
-
-    last_name = forms.CharField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Last name'
-            }
-        )
-    )
-
-    email = forms.EmailField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Personal email'
-            }
-        )
-    )
-
-    company = forms.CharField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Company'
-            }
-        )
-    )
+    first_name = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'First name'}))
+    last_name = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Last name'}))
+    email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Personal email'}))
+    company = forms.CharField(label='', widget=forms.TextInput(attrs={'placeholder': 'Company'}))
 
     class Meta:
         model = User
@@ -181,36 +175,16 @@ class EmployerEditForm(forms.ModelForm):
 
 class EmployerProfileForm(forms.ModelForm):
     company_email = forms.EmailField(
-        required=False,
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Company email'
-            }
-        )
+        required=False, label='', widget=forms.TextInput(attrs={'placeholder': 'Company email'})
     )
-
     company_site = forms.URLField(
-        required=False,
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Company website'
-            }
-        )
+        required=False, label='', widget=forms.TextInput(attrs={'placeholder': 'Company website'})
     )
-
     company_info = forms.CharField(
-        required=False,
-        label='About the company:', 
-        widget=CKEditorWidget()
+        required=False, label='About the company:', widget=CKEditorWidget()
     )
-
     company_spheres = forms.MultipleChoiceField(
-        required=False,
-        choices=SPHERES, 
-        widget=forms.CheckboxSelectMultiple(), 
-        label='Company scopes'
+        required=False, choices=SPHERES, widget=forms.CheckboxSelectMultiple(), label='Company scopes:'
     )
 
     class Meta:
@@ -219,17 +193,15 @@ class EmployerProfileForm(forms.ModelForm):
 
 
 class VacancyForm(forms.ModelForm):
-    salary = forms.IntegerField(required=False)
+    salary = forms.IntegerField(required=False, min_value=0)
     body = forms.CharField(widget=CKEditorWidget(), label='Description')
     need_exp = forms.ChoiceField(choices=NEED_EXP, label='Requared work experience')
     employment = forms.MultipleChoiceField(
-        choices=EMPLOYMENT,
-        widget=forms.CheckboxSelectMultiple(),
-        label='Employment type')
+        choices=EMPLOYMENT, widget=forms.CheckboxSelectMultiple(), label='Employment type'
+    )
     schedule = forms.MultipleChoiceField(
-        choices=SCHEDULE, 
-        widget=forms.CheckboxSelectMultiple(), 
-        label='Work schedule')
+        choices=SCHEDULE, widget=forms.CheckboxSelectMultiple(), label='Work schedule'
+    )
         
     class Meta:
         model = Vacancy
@@ -240,94 +212,44 @@ class VacancyForm(forms.ModelForm):
 
 class AuthenticationForm(AuthenticationForm):
     username = forms.CharField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'autofocus': True, 
-                'placeholder': 'Email'
-            }
-        )
+        label='', widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'Email'})
     )
-    
     password = forms.CharField(
-        label='', 
-        strip=False, 
-        min_length=8, 
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': 'Password'
-            }
-        )
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
     )
 
 
 class PasswordChangeForm(PasswordChangeForm):
     old_password = forms.CharField(
-        label='',
-        strip=False,
-        min_length=8,
-        widget=forms.PasswordInput(
-            attrs={
-                'autofocus': True, 
-                'placeholder': 'Old password'
-            }
-        )
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'autofocus': True, 'placeholder': 'Old password'}
+            )
     )
-
     new_password1 = forms.CharField(
-        label='', 
-        strip=False,
-        min_length=8,
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': 'New password'
-            }
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'New password'}
         )
     )
-
     new_password2 = forms.CharField(
-        label='',
-        strip=False,
-        min_length=8,
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': 'New password again'
-            }
+        label='', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'New password again'}
         )
     )
 
 
 class PasswordResetForm(PasswordResetForm):
-    email = forms.EmailField(
-        label='', 
-        widget=forms.TextInput(
-            attrs={
-                'placeholder': 'Email'
-            }
-        )
-    )
+    email = forms.EmailField(label='', widget=forms.TextInput(attrs={'placeholder': 'Email'}))
 
 
 class PasswordSetForm(SetPasswordForm):
     password1 = forms.CharField(
-        label='New password', 
-        strip=False, 
-        min_length=8,
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': 'New password'
-            }
+        label='New password', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'New password'}
         )
     )
-
     password2 = forms.CharField(
-        label='New password again', 
-        strip=False, 
-        min_length=8,
-        widget=forms.PasswordInput(
-            attrs={
-                'placeholder': 'New password'
-            }
+        label='New password again', strip=False, min_length=8, widget=forms.PasswordInput(
+            attrs={'placeholder': 'New password'}
         )
     )
 

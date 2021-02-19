@@ -12,15 +12,13 @@
             <a class="action-link" href="{% url 'vacancies' user.id %}?edit=True&vac_id={{ vacancy.id }}">Edit</a>
         {% endif %}
     </h2><hr>
-
-    <p>From {{ vacancy.salary}} $</p>
+    {% if vacancy.salary %}
+        <p>From {{ vacancy.salary}} $</p>
+    {% else %}
+        <p>Salary wasn't specified</p>
+    {% endif %}
     <p><a href="{% url 'profile' company_id %}">{{ company }}</a></p><br>
     <p>Required work experience: {{ vacancy.need_exp }}</p>
     <p>{{ vacancy.employment }}, {{ vacancy.schedule }}</p><br>
-    <!-- <pre>{{ body }}</pre> -->
-    <div class="vacancy-body">
-        {{ body|safe }}
-    </div>
-
-    <br><br><hr> 
+    <p>{{ body | safe }}</p>
 {% endblock %}

@@ -154,10 +154,14 @@ class EditPersonalView(View):
             user = User.objects.get(pk=request.user.id)
             if not user.company:
                 user_form = ApplicantEditForm(instance=user, data=request.POST)
-                profile_form = ApplicantProfileForm(instance=user.applicant, data=request.POST, files=request.FILES)
+                profile_form = ApplicantProfileForm(
+                    instance=user.applicant, data=request.POST, files=request.FILES
+                )
             else:
                 user_form = EmployerEditForm(instance=user, data=request.POST)
-                profile_form = EmployerProfileForm(instance=user.employer, data=request.POST, files=request.FILES)
+                profile_form = EmployerProfileForm(
+                    instance=user.employer, data=request.POST, files=request.FILES
+                )
 
             if user_form.is_valid():
                 user_form.save()
@@ -480,21 +484,11 @@ class VacancyView(View):
     def get(self, request, *args, **kwargs):
         try:
             vacancy = Vacancy.objects.get(pk=kwargs['vac_id'])
+            if not vacancy.active:
+                return render(request, 'errors/unexist_vacancy.html')
         except Vacancy.DoesNotExist:
-            return render(request, 'errors/unexist_vacancy')
-    
-        if not vacancy.active:
-            if request.user.is_authenticated:
-                if request.user.company:
-                    if vacancy.employer != request.user.employer:
-                        vacancy = None
-                        return render(request, 'errors/403.html')
-                else:
-                    return render(request, 'errors/403.html')
-            else:
-                return redirect('login')
-            
-        #body = vacancy.body.replace('\n', ' < br >', 100)
+            return render(request, 'errors/unexist_vacancy.html')
+                
         context = {
             'user': request.user,
             'employer': Employer.objects.get(vacancies=vacancy),
@@ -506,11 +500,9 @@ class VacancyView(View):
         }
         
         return render(request, 'vacancy.html', context)
-            
-    def post(self, request, *args, **kwargs):
-        pass
 
-from django.core.paginator import Paginator
+
+# from django.core.paginator import Paginator
 
 class VacancySearchView(View):
     def get(self, request, *args, **kwargs):
@@ -520,21 +512,18 @@ class VacancySearchView(View):
             return render(request, 'errors/unexist_vacancy')
 
         if not vacancy.active:
-            vacancy = None
-            return render(request, 'vacancy.html', {'vacancy': vacancy})
+            return render(request, 'errors/unexist_vacancy.html')
 
         # vacancies = Vacancy.objects.all()
         # paginator = Paginator(vacancies, 10)
         # page_number = request.GET.get('page')
         # page_obj = paginator.get_page(page_number)
-        print(vacancy.body)
-        body = vacancy.body
 
         context = {
             'user': request.user,
             'employer': Employer.objects.get(vacancies=vacancy),
             'vacancy': vacancy,
-            'body': body,
+            'body': vacancy.body,
             'vac_id': vacancy.id,
             'company': vacancy.employer.user.company,
             'company_id': vacancy.employer.user.id
