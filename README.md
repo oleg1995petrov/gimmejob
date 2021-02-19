@@ -8,7 +8,7 @@ TMS (fr5) 2021 | Diploma project
 - [App]
 
 
-## Framework 
+## Frameworks
 - [Django]
 
 
