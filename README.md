@@ -1,4 +1,4 @@
-## GimmeJob
+## GimmeJob - website for job/employee search.
 ```
 TMS (fr5) 2021 | Diploma project
 ```
