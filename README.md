@@ -2,7 +2,7 @@
 ```
 TMS-2021 | Diploma project
 ```
-
+![just a picture](https://github.com/oleg1995petrov/gimmejob/blob/master/logo.png)
 
 ## Heroku 
 - [App]
