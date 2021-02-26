@@ -26,9 +26,6 @@ REGISTRATION_SUCCESS = "You're has been successfully registered"
 
 class HomeView(View):
     def get(self, request):
-        #User.objects.get(pk=40).delete()
-        #User.objects.filter(id__gt=40).delete()
-        #Applicant.objects.filter(id__gt=1).delete()
         return render(request, 'home.html')
 
 
