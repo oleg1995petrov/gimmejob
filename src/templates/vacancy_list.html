@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    My vacancies
+{% endblock %}
+
+{% block content %}
+    <div class="header-left">
+        <h2>Vacancies
+            &ensp;<span>
+                <a href="{% url 'vacancy_list' %}?add=new">
+                    <img class="action-owner" src="{{ BADGES_URL }}add.png" alt="Добавить">
+                    <!-- <input type="button" class="button button-green" value="Add"> -->
+                </a>
+                </h2><hr>
+            </span>
+
+        {% if active_vacancies %}
+            <div class="oneline">
+                <h6 class="indent-first-line">Active vacancies:</h6>
+            </div>
+            {% for vacancy in active_vacancies %}
+                <div class="value-without-property">
+                    <p><a class="vacancy-link" href="{% url 'vacancy_detail' vacancy.id %}">{{ vacancy.position }}</a></p>
+                </div>
+            {% endfor %}
+
+            <hr class="hr-grey">
+        {% endif %}
+
+        {% if inactive_vacancies %}
+            <div class="oneline">
+                <h6 class="indent-first-line">Inactive vacancies:</h6>
+            </div>
+            <div class="value-without-property">
+                {% for vacancy in inactive_vacancies %}
+                    <p><a class="vacancy-link" href="{% url 'vacancy_list' %}?edit={{ vacancy.id }}">{{ vacancy.position }}</a></p>
+                {% endfor %}
+            </div>
+            <hr class="hr-grey">
+        {% endif %}
+    </div>
+{% endblock %}

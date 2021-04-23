@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load tags %}
+
+{% block title %}
+    {{ vacancy.position }}
+{% endblock %}
+
+{% block content %}
+    <h5 class="header">{{ vacancy.position }}
+        {% if user.employer == vacancy.employer %}
+            &ensp;
+            <span>
+                <a href="{% url 'vacancy_list' %}?edit={{ vacancy.id }}">
+                    <img class="action-owner" src="{{ BADGES_URL }}edit.png" alt="Редактировать">
+                    <!-- <input type="button" class="button button-blue" value="Edit"> -->
+                </a>
+            </span> 
+
+            &ensp;
+            <span>
+                <a href="{% url 'vacancy_list' %}?delete={{ vacancy.id }}">
+                    <img class="action-owner" src="{{ BADGES_URL }}delete.png" alt="Удалить">
+                    <!-- <input type="button" class="button button-red" value="Delete"> -->
+                </a>
+            </span>
+        {% endif %}
+    </h2>
+    <hr>
+    <div class="value-without-property">
+        <!-- <p>{{ vacancy.published|date:"d F Y" }}</p> -->
+        <p>Вакансия опубликована: {{ vacancy.published|timesince|only_first_period:',' }} назад</p>
+        {% if vacancy.salary %}
+            <p>От {{ vacancy.salary}} {{ vacancy.currency }}</p>
+        {% endif %}
+        
+        <p><a class="link" href="{% url 'profile' vacancy.employer.user.id %}">{{ employer }}</a></p>
+        <br>
+        <p>Требуемый опыт работы: {{ vacancy.get_experience_display }}</p>
+        <p>{{ vacancy.get_employment_display }}, {{ vacancy.get_schedule_display}}</p>
+        <br>
+        <hr class="hr-grey">
+        {{ body|safe }}
+    </div>
+    <br>
+    <hr class="hr-grey">
+{% endblock %}

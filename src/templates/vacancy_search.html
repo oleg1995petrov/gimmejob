@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+{% load tags %}
+
+{% block title %}
+    Vacancy searching
+{% endblock %}
+
+{% block content %}
+    <h3 class="header">Поиск вакансий</h3><hr>
+    <div class="vacancy-search">
+        <form action="{% url 'vacancy_search' %}">
+            <input type="text" name="employer" placeholder="Введите название компании">
+            <button type="submit">Искать</button>
+        </form>
+    </div>
+    <br><br>
+
+    <div class="header">
+        {% for vacancy in vacancies %}
+            <div class="search vacancy-search">
+                <form action="{% url 'vacancy_search' %}" method="post"> {% csrf_token %}
+                    <h6>
+                        <a class="link" href="{% url 'vacancy_detail' vacancy.id %}">
+                            <span>{{ vacancy.position }}</span>
+                        </a>
+                    </h6>
+                    
+                    <p class="no-indent">
+                        <a class="link small-text" href="{% url 'profile' vacancy.employer.user.id %}">
+                            <span>{{ vacancy.employer }}</span>
+                        </a>
+                    </p>
+
+                    <br>
+                    <p>{{ vacancy.get_short_body }}</p>
+                    <br>
+                    
+                    <div class="vacancy-action small-text">
+                        <div>
+                            <span class="vacancy-action-indent">               
+                                <button type="submit" class="button button-blue">Откликнуться</button>
+                            </span>
+                            <span class="vacancy-action-indent">
+                                <a href="#">Не показывать</a>
+                            </span>
+                            <span class="vacancy-action-indent">
+                                <a href="#">В избранное</a>
+                            </span>
+                        </div>
+
+                        <div>
+                            {{ vacancy.published|date:"F d, Y" }}
+                        </div>
+                    </div>
+                </form>
+            </div>
+        {% endfor %}
+    </div>
+        
+        
+        <!-- PAGINATION -->
+        {% include 'vacancy_pagination.html' %}
+        <!-- PAGINATION END -->
+    
+{% endblock %}
+
+{% block vacancy_filter %}
+    <div class="vacancy-filter">
+        <h5>Фильтр</h5><hr>
+        <br>
+        <form action="{% url 'vacancy_search' %}">
+            <div>
+                <p>Опыт работы:</p>
+                <!-- <ul>
+                    {% for vacancy in view.get_experience %}
+                    <li>
+                        <input type="checkbox" name="experience" value="{{ vacancy.experience }}">
+                        <span>{{ vacancy.experience }}</span>
+                        <span>{{ vacancy.count }}</span>
+                    </li>
+                    {% endfor %}
+                </ul> -->
+
+                    <ul>
+                        {% for k,v in experience0.items %}
+                        <li>
+                            <input type="checkbox" name="experience" value="{{ v }}">
+                            <span>{{ k }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+
+            </div>
+
+            <div>
+                <p>Тип занятости:</p>
+                <!-- <ul>
+                    {% for vacancy in view.get_employment %}
+                        {% for employment in vacancy.employment %}
+                    <li>
+                        <input id="{{ vacancy.employment }}" type="checkbox" name="employment" value="{{ employment }}">
+                        <span>{{ employment }}</span>
+                        <span>{{ vacancy.count }}</span>
+                    </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul> -->
+                <ul>
+                    {% for k,v in employment0.items %}
+                    <li>
+                        <input type="checkbox" name="employment" value="{{ v }}">
+                        <span>{{ k }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            
+            <div>
+                <p>График работы:</p>
+                <!-- <ul>
+                    {% for vacancy in view.get_schedule %}
+                        {% for schedule in vacancy.schedule %}
+                    <li>
+                        <input type="checkbox" name="schedule" value="{{ schedule }}">
+                        <span>{{ schedule }}</span>
+                        <span>{{ vacancy.count }}</span>
+                    </li>
+                        {% endfor %}
+                    {% endfor %}
+                </ul> -->
+
+                <ul>
+                    {% for k,v in schedule0.items %}
+                    <li>
+                        <input type="checkbox" name="schedule" value="{{ v }}">
+                        <span>{{ k }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+
+            </div>
+            
+            <!-- <div>
+                <p>Дата публикации:</p>
+                <ul>
+                    {% for vacancy in view.get_published %}
+                    <li>
+                        <input type="checkbox" name="published" value="{{ vacancy.published }}">
+                        <span>{{ vacancy.published }}</span>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div> -->
+            <button type="submit">Поиск</button>
+        </form>
+    </div>               
+{% endblock %}

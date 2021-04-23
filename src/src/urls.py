@@ -16,6 +16,8 @@ Including another URLconf
 from django.conf.urls import url, handler400, handler403, handler404, handler500
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls.i18n import i18n_patterns
+
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -23,6 +25,7 @@ from django.conf.urls.static import static
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('app.urls')),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
 ] 
 
 

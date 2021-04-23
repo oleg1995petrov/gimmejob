@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% load static %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    Languages editing
+{% endblock %}
+
+{% block content %}
+    <div class="header-left">
+        <form action={% url 'edit_languages' %} method="POST">{% csrf_token %}
+            <h2>Edit your profile</h2><hr>
+            <h6 class="checkbox-label">{{ form.languages.label }}</h6>
+            <div class="form-row">
+                <div class="form-row-field-checkbox-3">
+                    {{ form.languages }}
+                </div>
+            </div>
+            <br><br>
+            
+            <div class="center">
+                <button class="button button-red" type="button" onclick="history.go(-1)">Cancel</button>
+                <button class="button button-green" type="submit">Save</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}

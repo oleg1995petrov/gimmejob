@@ -1,0 +1,73 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en-us">
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <meta charset="UTF-8">
+    <meta name='viewport' content='width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no'>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="icon" href="{% static 'images/favicon.png' %}" type="image/png"> 
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.2/css/all.css">
+        <!-- <script src="https://cdn.ckeditor.com/ckeditor5/24.0.0/classic/ckeditor.js"></script> -->
+</head>
+<body>    
+    <div class="head">
+        <nav class="nav_left">
+            <a class="nav-link" href="{% url 'home' %}"><i class="fas fa-home"></i>Главная</a>
+        </nav>
+
+        <nav class="nav_right">
+            {% if request.user.is_authenticated %}
+                <a class="nav-link" href="{% url 'logout' %}"><i class="fas fa-lock"></i>Выйти</a>
+            {% else %}
+                <a class="nav-link" href="{% url 'login' %}"><i class="fas fa-user-circle"></i>Войти</a>
+                <a class="nav-link" href="{% url 'registration' %}"><i class="fas fa-lock"></i>Зарегистрироваться</a>
+            {% endif %}
+        </nav>
+    </div>        
+
+    <aside>
+        {% if request.user.is_authenticated and request.user.applicant %}
+            <nav class="nav_aside">
+                <a class="nav-link" href="{% url 'profile' request.user.id %}"><i class="fas fa-user-circle"></i>Мой профиль</a>
+                <a class="nav-link" href=""><i class="fas fa-home"></i>Отклики</a>
+                <a class="nav-link" href="{% url 'vacancy_search' %}"><i class="fas fa-user-circle"></i>Поиск вакансий</a>
+                <a class="nav-link" href="{% url 'employer_search' %}"><i class="fas fa-user-circle"></i>Поиск компаний</a>
+            </nav>
+        {% endif %}
+
+        {% if request.user.is_authenticated and request.user.employer %}
+            <nav class="nav_aside">
+                <a class="nav-link" href="{% url 'profile' request.user.id %}"><i class="fas fa-user-circle"></i>Мой профиль</a>
+                <a class="nav-link" href="{% url 'vacancy_list' %}"><i class="fas fa-user-circle"></i>Мои вакансии</a>
+                <a class="nav-link" href="#"><i class="fas fa-home"></i>Отклики</a>
+                <a class="nav-link" href="{% url 'vacancy_search' %}"><i class="fas fa-user-circle"></i>Поиск вакансий</a>
+                <a class="nav-link" href="{% url 'employer_search' %}"><i class="fas fa-user-circle"></i>Поиск компаний</a>
+            </nav> 
+        {% endif %}
+
+        {% if not request.user.is_authenticated %}
+            <nav class="nav_aside">
+                <a class="nav-link" href="{% url 'vacancy_search' %}"><i class="fas fa-user-circle"></i>Поиск вакансий</a>
+                <a class="nav-link" href="{% url 'employer_search' %}"><i class="fas fa-user-circle"></i>Поиск компаний</a>
+            </nav>
+        {% endif %}
+    </aside>
+        
+    <main>       
+        {% if messages %}
+            <ul class="messages">
+            {% for message in messages %}
+                <li class="messages {{ message.tags }}">{{ message }}</li>  
+            {% endfor %}
+            </ul>
+        {% endif %}
+        {% block content %}{% endblock %}
+        <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>
+    </main>
+
+    {% block vacancy_filter %}{% endblock %}
+</body>
+</html

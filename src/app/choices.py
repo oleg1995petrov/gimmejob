@@ -4,9 +4,10 @@ from django.utils.translation import gettext_lazy as _
 
 YEAR_MIN = date.today().year - 10
 YEAR_MAX = YEAR_MIN - 100
-YEARS = [year for year in range(YEAR_MIN, YEAR_MAX, -1)]
 YEAR_NOW = date.today().year
 YEAR_MIN_WORK = YEAR_NOW - 60
+
+YEARS = [year for year in range(YEAR_MIN, YEAR_MAX, -1)]
 WORK_YEARS = [year for year in range(YEAR_NOW, YEAR_MIN_WORK, -1)]
 
 LOCATION = [
@@ -99,10 +100,10 @@ SPHERES = [
 EDUCATION = [
     (None, '------------'),
     ('High school', _('Hight school diploma')),
-    ('Associate', _("Associate’s degree")),
-    ('Bachelor', _("Bachelor’s degree")),
-    ('Master', _("Master’s degree")),
-    ('Doctoral', _('Doctoral degree'))
+    ("Associate's", _("Associate’s")),
+    ("Bachelor's", _("Bachelor’s")),
+    ("Master's", _("Master’s")),
+    ('Doctoral', _('Doctoral'))
 ]
 
 SPECIALIZATION = [
@@ -119,8 +120,9 @@ SPECIALIZATION = [
 ]
 
 NEED_EXP = [
-    ('Not required', _('No experience')),
-    ('1-3 years', _('From 1 to 3 years')),
+    (None, '------------'),
+    ('', _('Нет опыта')),
+    ('from 1 to 3 years', _('From 1 to 3 years')),
     ('1-6 years', _('From 3 to 6 years')),
     ('Over 6 years', _('Over 6 years'))
 ]
@@ -136,4 +138,12 @@ SCHEDULE = [
     ('Shift work', _('Shift work')),
     ('Flexible schedule', _('Flexible schedule')),
     ('Remote work', _('Remote work'))
+]
+
+CURRENCY = [
+    (None, '------------'),
+    ('BYN', 'BYN'),
+    ('USD', 'USD'),
+    ('EUR', 'EUR'),
+    ('RUB', 'RUB')
 ]
