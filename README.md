@@ -1,4 +1,5 @@
-## GimmeJob - website for job/employee search
+## Job/employee search app
+
 
 ![just a picture](https://github.com/oleg1995petrov/gimmejob/blob/master/logo.png)
 
