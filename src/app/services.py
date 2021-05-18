@@ -27,10 +27,3 @@ def rename_avatar(instance, filename):
 
 def get_next_path(request):
     return f'?next={request.get_full_path()}'
-
-# def get_vacancy_experience():
-#     experience = {}
-#     for i in models.Vacancy.EXPERIENCE:
-#         experience[i[1]] = i[0]
-
-#     return experience

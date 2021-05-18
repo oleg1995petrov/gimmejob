@@ -62,15 +62,14 @@ class ProfileView(DetailView):#( View):
     slug_field = 'pk'
 
     def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data()
-        context['user'] = self.request.user
-        context['user_view'] = self.object
+        context = super().get_context_data(**kwargs)
         if self.object.is_employer:
             context['vacancies'] = Vacancy.objects.filter(
                 employer=self.object.employer, active=True).only('id', 'position')
+           
         return context
   
-    def dispatch(self, *args, **kwargs):
+    def dispatch(self, request, *args, **kwargs):
         try:
             obj = super().get_object()
             if obj.is_employer:
@@ -78,33 +77,8 @@ class ProfileView(DetailView):#( View):
             else:
                 self.template_name = 'profile-applicant.html'
         except Http404:
-            return render(self.request, 'errors/unexist_profile.html')
-        return super().dispatch(self.request, *args, **kwargs)
-
-    #@method_decorator(login_required)
-    # def get(self, request, *args, **kwargs):
-    #     try:
-    #         user_view = User.objects.get(pk=kwargs['user_id'])
-    #     except User.DoesNotExist:
-    #         return render(request, 'errors/unexist_profile.html')
-
-        # context = {
-        #     'user': request.user,
-        #     'user_view': user_view,
-        # }
-        
-        # EMPLOYER
-        # if user_view.company:
-        #     vacancies = user_view.employer.vacancies.all()
-        #     context['vacancies'] = vacancies
-
-        # APPLICANT
-        # elif request.user.is_authenticated and not request.user.company and (
-        # not request.user.is_admin and request.user != user_view):
-        #     if not user_view.company:
-        #         return render(request, 'errors/403.html', status=403)
-
-        #return render(request, 'profile.html', context)
+            return render(request, 'errors/unexist_profile.html')
+        return super().dispatch(request)
 
 
 class EditPersonalView(View):
@@ -112,26 +86,32 @@ class EditPersonalView(View):
 
     def get(self, request):
         if request.user.is_authenticated:
-            user = request.user
-            if user.is_applicant:
-                cat = request.GET.get('cat')
-                user_form = ApplicantEditForm(instance=user)
-                profile_form = ApplicantProfileForm(instance=user.applicant)
+            if request.user.is_applicant:
+                applicant = request.user.applicant
+                category = request.GET.get('cat')
+                user_form = ApplicantEditForm(instance=applicant.user)
+                profile_form = ApplicantProfileForm(instance=applicant)
+                education_form = EducationForm(instance=applicant)
+                skills_form = SkillsForm(instance=applicant)
+                languages_form = LanguagesForm(instance=applicant)
                 template = 'edit_applicant.html'
                 context = {
+                    'applicant': applicant,
                     'user_form': user_form,
                     'profile_form': profile_form,
-                    'user': user,
-                    'cat': cat
+                    'education_form': education_form,
+                    'skills_form': skills_form,
+                    'languages_form': languages_form,
+                    'category': category
                 }
             else:
-                user_form = EmployerEditForm(instance=user)
-                profile_form = EmployerProfileForm(instance=user.employer)
+                employer = request.user.employer
+                user_form = EmployerEditForm(instance=employer.user)
+                profile_form = EmployerProfileForm(instance=employer)
                 template = 'edit_employer.html'
                 context = {
                     'user_form': user_form,
                     'profile_form': profile_form, 
-                    'user': user
                 }
 
             return render(request, template, context)
@@ -141,11 +121,18 @@ class EditPersonalView(View):
         if request.user.is_authenticated:
             user = request.user
             if not user.company:
-                user_form = ApplicantEditForm(instance=user, data=request.POST)
+                user_form = ApplicantEditForm(
+                    instance=user, 
+                    data=request.POST
+                )
                 profile_form = ApplicantProfileForm(
                     instance=user.applicant, 
                     data=request.POST, 
                     files=request.FILES
+                )
+                education_form = EducationForm(
+                    instance=request.user.applicant, 
+                    data=request.POST
                 )
             else:
                 user_form = EmployerEditForm(instance=user, data=request.POST)

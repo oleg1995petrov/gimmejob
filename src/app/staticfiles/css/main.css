@@ -2,6 +2,7 @@ body {
     background-color: #eeedf0;
     font-family: Helvetica, Arial, sans-serif;
     font-size: 13px;
+    overflow-y: scroll;
 }
 
 header {
@@ -104,22 +105,29 @@ main i:hover {
     padding-left: 23.8%;
 }
 
+.side-bar-ol {
+    padding: 0;
+    margin: 0 16px 0 -6px;
+    list-style: none;
+}
+
 .side-bar-li {
-    height: 30px;
     line-height: 30px;
+}
+
+.side-bar-li:hover {
+    background-color: #e4e4eb;
+    border-radius: 4px;
 }
 
 .side-bar-link {
     display: block;
     color: #000;
-    padding: 0 6px 0;
-    width: 100%;
+    padding-left: 6px;
 }
 
 .side-bar-link:hover {
     color: #000;
-    background-color: #e4e4eb;
-    border-radius: 4px;
     text-decoration: none;
 }
 
@@ -152,19 +160,14 @@ main i:hover {
 }
 
 #side-bar {
-    width: 165px;
+    width: 164px;
     float: left;
-}
-
-.side-bar-ol {
-    padding: 0;
-    margin: 0 16px 0 -6px;
-    list-style: none;
 }
 
 #page-body {
     width: 795px;
     float: right;
+    overflow: hidden;
 }
 
 #narrow-column {
@@ -181,9 +184,10 @@ main i:hover {
     float: right;
 }
 
-/* .narrow-column-right-inner {
-    padding-left: 20px;
-} */
+.narrow-column-right-inner {
+    width: 230px;
+    padding: 7px 0;
+}
 
 .rmenu-link {
     display: block;
@@ -215,7 +219,7 @@ main i:hover {
     background: #fff;
     border-radius: 4px;
     margin-bottom: 15px;
-    box-shadow: 0 1px 0 1px#dce1e6;
+    box-shadow: 0 1px 0 0 #dce1e6;
 }
 
 .separator {
@@ -232,10 +236,9 @@ main i:hover {
     overflow: hidden;
 }
 
-#profile-info-user-name {
+#profile-info-username {
     font-size: 19px;
-    font-weight: 400;
-    margin-bottom: 0px;
+    font-weight: 600;
 }
 
 .profile-info-header {
@@ -273,7 +276,7 @@ main i:hover {
 }
 
 .small-text {
-    font-size: 12px;
+    font-size: 12.5px;
 }
 
 .message {
@@ -301,7 +304,6 @@ main i:hover {
     text-align: center;
     background-color: #eeedf0;
     border-radius: 4px;
-    height: 30px;
     line-height: 30px;
 }
 
