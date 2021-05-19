@@ -1,35 +1,32 @@
 from datetime import date
+
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required, permission_required
-from django.contrib.auth.views import logout_then_login
-from django.http import Http404
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 # from django.contrib.auth.models import Permission
 from django.contrib.auth.tokens import default_token_generator
+from django.contrib.auth.views import logout_then_login
 # from django.contrib.contenttypes.models import ContentType
 # from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
-from django.db.models import Q, Count
-from django.forms import modelformset_factory, formset_factory, inlineformset_factory
-from django.shortcuts import render, redirect, get_object_or_404
+from django.db.models import Count, Q
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory
+from django.http import Http404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.utils.encoding import force_bytes, force_str
-from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
-from django.views.generic import View
-from django.views.generic import ListView
-from django.views.generic import UpdateView 
-from django.views.generic import DetailView
-from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.views.generic import DetailView, ListView, UpdateView, View
 
-
-from .forms import *
-from .models import User, Applicant, Employer, Experience, Vacancy
-from .mixins import VacancyFilterMixin
 from . import services
+from .forms import *
+from .mixins import VacancyFilterMixin
+from .models import Applicant, Employer, Experience, User, Vacancy
 
 
 class HomeView(View):

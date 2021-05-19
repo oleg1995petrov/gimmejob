@@ -285,9 +285,9 @@ main i:hover {
 }
 
 #profile-info-show-more {
-    margin-top: 8px 0 10px;
-    height: 40px;
     line-height: 40px;
+    padding-left: 165px;
+    text-align: left;
     background-color: #fff;
     border: none;
     width: 100%;
