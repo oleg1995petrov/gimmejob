@@ -101,7 +101,7 @@ class Applicant(models.Model):
         verbose_name_plural = 'Соискаители'
 
     def __str__(self):
-        return self.user.first_name, self.user.last_name
+        return f'{self.user.first_name}, {self.user.last_name}'
     
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.user.id})

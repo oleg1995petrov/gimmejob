@@ -9,8 +9,8 @@ from .models import Applicant, Employer, Experience, Vacancy, User
 
 class ApplicantInline(admin.TabularInline): # or admin.StackedInline
     model = Applicant
-    readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship', 'education',
-                        'specialization', 'skills', 'languages')
+    readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship', 
+                        'education', 'specialization', 'skills', 'languages')
 
     def get_image(self, obj):
         try:
@@ -113,9 +113,9 @@ class ApplicantAdmin(admin.ModelAdmin):
 
     def get_image(self, obj):
         try:
-            return mark_safe(f'<img src={ obj.photo.url } width="60" height="60">')
+            return mark_safe(f'<img src={ obj.photo.url } width="60" height="80">')
         except ValueError:
-            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="60">')
+            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="80">')
 
     get_image.short_description = 'Фото'
 

@@ -23,12 +23,14 @@ class ClearableFileInput(forms.ClearableFileInput):
 # APPLICANT
 
 class ApplicantCreationForm(forms.ModelForm):
-    # first_name = forms.CharField(
-    #     label='', widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'First name'})
-    # )
-    # last_name = forms.CharField(
-    #     label='', widget=forms.TextInput(attrs={'placeholder': 'Last name'})
-    # )
+    first_name = forms.CharField(
+        label='', 
+        widget=forms.TextInput(attrs={'autofocus': True, 'placeholder': 'First name'})
+    )
+    last_name = forms.CharField(
+        label='', 
+        widget=forms.TextInput(attrs={'placeholder': 'Last name'})
+    )
     email = forms.EmailField(
         label='', widget=forms.TextInput(attrs={'placeholder': 'Email address'})
     )
@@ -41,8 +43,8 @@ class ApplicantCreationForm(forms.ModelForm):
 
     class Meta:
         model = User
-        # fields = ('first_name', 'last_name', 'email')
-        fields = ('email',)
+        fields = ('first_name', 'last_name', 'email')
+        # fields = ('email',)
 
     def clean_password(self):
         password1 = self.cleaned_data["password1"]
