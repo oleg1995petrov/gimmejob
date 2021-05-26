@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.postgres.fields import ArrayField
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, AbstractUser, PermissionsMixin
 from django.conf import settings
+from django.db.models.fields.related import ForeignKey, ManyToManyField
+from django.db.models.fields.related_descriptors import ManyToManyDescriptor
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from multiselectfield import MultiSelectField
@@ -94,14 +96,15 @@ class Applicant(models.Model):
     education = models.CharField('Уровень образования', max_length=20, choices=choices.EDUCATION, default='')
     specialization = models.CharField('Специализация', max_length=50, choices=choices.SPECIALIZATION, default='')
     skills = MultiSelectField('Ключевые навыки', max_length=1000, choices=choices.SKILLS, blank=True, null=True)
-    languages = MultiSelectField('Знание языков', max_length=500, choices=choices.LANGUAGES, blank=True, null=True)
+    # languages = MultiSelectField('Знание языков', max_length=500, choices=choices.LANGUAGES, blank=True, null=True)
+    languages = ManyToManyField('Language', through='ApplicantLanguage', verbose_name='Языки', related_name='applicant')
 
     class Meta:
         verbose_name = 'Соискаитель'
         verbose_name_plural = 'Соискаители'
 
     def __str__(self):
-        return f'{self.user.first_name}, {self.user.last_name}'
+        return f'{self.user.first_name} {self.user.last_name}'
     
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.user.id})
@@ -126,18 +129,44 @@ class Employer(models.Model):
             
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.user.id})
+
+### LANGUAGES
+
+class Language(models.Model):
+
+    language = models.CharField('Язык', max_length=50)
+    level = models.CharField('Уровень владения', max_length=25, null=True, blank=True)
+
+    class Meta:
+        verbose_name = 'Язык'
+        verbose_name_plural = 'Языки'
+
+    def __str__(self):
+        if self.level:
+            return f'{self.language} ({self.level})'
+        else:
+            return f'{self.language}'
+        
+
+class ApplicantLanguage(models.Model):
     
+    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)
+    language = models.ForeignKey(Language, on_delete=models.CASCADE)
+
+### LANGUAGES
+
 
 class Experience(models.Model):
+    """ """
+
     applicant = models.ForeignKey(Applicant, verbose_name='Соискатель', on_delete=models.CASCADE, related_name='experience')
-    begin = models.DateField('Начало работы')
-    now = models.BooleanField('По настоящее время', null=True)
-    end = models.DateField('Окончание', null=True)
-    company = models.CharField('Организация', max_length=100)
-    company_site = models.URLField('Сайт', null=True)
-    company_spheres = MultiSelectField('Сфера деятельности компании', choices=choices.SPHERES)
-    position = models.CharField('Должность', max_length=50)
-    responsibilities = models.TextField('Обязанности на рабочем месте')
+    begin = models.DateField('С')
+    now = models.BooleanField('На данный момент я работаю в этой должности', null=True, blank=True)
+    end = models.DateField('По', null=True, blank=True)
+    company = models.CharField('Компания', max_length=100, default='', blank=True)
+    employment = models.CharField('Тип занятости', max_length=50, choices=choices.EMPLOYMENT, default='')
+    position = models.CharField('Должность', max_length=100)
+    responsibilities = models.TextField('Описание', default='', blank=True)
 
     class Meta:
         verbose_name = 'Опыт работы'
@@ -149,33 +178,6 @@ class Experience(models.Model):
 
 
 class Vacancy(models.Model):
-    EXPERIENCE = (
-        ('noExp', _('Без опыта')),
-        ('from1To3', _('От 1 года до 3 лет')),
-        ('from3To6', _('От 3 до 6 лет')),
-        ('over6', _('Более 6 лет'))
-    )
-
-    EMPLOYMENT = (
-        ('ftime', _('Полная занятость')),
-        ('ptime', _('Частичная занятость')),
-        ('trainee', _('Стажировка'))
-    )
-
-    SCHEDULE = (
-        ('fday', _('Полный день')),
-        ('shift', _('Сменный график')),
-        ('flex', _('Гибкий график')),
-        ('remote', _('Удаленная работа'))
-    )
-
-    CURRENCY = (
-        (None, '------------'),
-        ('BYN', 'BYN'),
-        ('RUB', 'RUB'),
-        ('USD', 'USD'),
-        ('EUR', 'EUR'),
-    )
    
     employer = models.ForeignKey(
         Employer, 
@@ -187,10 +189,10 @@ class Vacancy(models.Model):
     active = models.BooleanField('Публиковать?')
     position = models.CharField('Должность', max_length=100)
     experience = models.CharField('Требуемый опыт работы', max_length=50, choices=EXPERIENCE)
-    employment = MultiSelectField('Тип занятости',max_length=100, choices=EMPLOYMENT)
-    schedule = MultiSelectField('График работы',max_length=100, choices=SCHEDULE)
+    employment = MultiSelectField('Тип занятости', max_length=100, choices=EMPLOYMENT)
+    schedule = MultiSelectField('График работы', max_length=100, choices=SCHEDULE)
     salary = models.PositiveSmallIntegerField('Уровень дохода', null=True)
-    currency = models.CharField('Валюта',max_length=3, choices=CURRENCY, default='')
+    currency = models.CharField('Валюта', max_length=3, choices=CURRENCY, default='')
     body = models.TextField('Описание вакансии')
     
     class Meta:

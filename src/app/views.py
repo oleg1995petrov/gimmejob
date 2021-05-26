@@ -12,7 +12,7 @@ from django.contrib.auth.views import logout_then_login
 # from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
-from django.forms import formset_factory, inlineformset_factory, modelformset_factory
+from django.forms import formset_factory, inlineformset_factory, modelformset_factory, Select
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse
@@ -23,10 +23,13 @@ from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import DetailView, ListView, UpdateView, View
 
+from app import widgets
+
 from . import services
 from .forms import *
 from .mixins import VacancyFilterMixin
-from .models import Applicant, Employer, Experience, User, Vacancy
+from .models import Applicant, Employer, Experience, User, Vacancy, Language, ApplicantLanguage
+import app
 
 
 class HomeView(View):
@@ -85,83 +88,182 @@ class EditPersonalView(View):
         if request.user.is_authenticated:
             if request.user.is_applicant:
                 applicant = request.user.applicant
+                CATEGORIES = ['education', 'career', 'skills', 'languages']
                 category = request.GET.get('cat')
-                user_form = ApplicantEditForm(instance=applicant.user)
+
+                user_form = ApplicantEditForm(instance=request.user)
                 profile_form = ApplicantProfileForm(instance=applicant)
                 education_form = EducationForm(instance=applicant)
                 skills_form = SkillsForm(instance=applicant)
-                languages_form = LanguagesForm(instance=applicant)
+                
+
                 template = 'edit_applicant.html'
                 context = {
                     'applicant': applicant,
+                    'category': category,
                     'user_form': user_form,
                     'profile_form': profile_form,
                     'education_form': education_form,
                     'skills_form': skills_form,
-                    'languages_form': languages_form,
-                    'category': category
+                    'categories': CATEGORIES,
                 }
-            else:
-                employer = request.user.employer
-                user_form = EmployerEditForm(instance=employer.user)
-                profile_form = EmployerProfileForm(instance=employer)
-                template = 'edit_employer.html'
-                context = {
-                    'user_form': user_form,
-                    'profile_form': profile_form, 
-                }
+
+                if applicant.experience.exists():
+                    experience_formset = modelformset_factory(Experience, form=ExperienceForm, extra=1)
+                    experience_forms = experience_formset(queryset=Experience.objects.filter(applicant=applicant))
+                    context['experience_forms'] = experience_forms
+                else:
+                    context['experience_form'] = ExperienceForm()
+                
+                if applicant.languages.exists():
+                    LangForm = LanguageForm#.language.widget.attrs.update({'choices': services.get_languages(LANGUAGES)})
+                    language_formset = modelformset_factory(Language, form=LangForm, extra=1)
+                    language_forms = language_formset(queryset=Language.objects.filter(applicant=applicant))
+                    context['language_forms'] = language_forms
+                else:
+                    context['language_form'] = LanguageForm()
+                
+
+            # else:
+            #     employer = request.user.employer
+            #     user_form = EmployerEditForm(instance=employer.user)
+            #     profile_form = EmployerProfileForm(instance=employer)
+            #     template = 'edit_employer.html'
+            #     context = {
+            #         'user_form': user_form,
+            #         'profile_form': profile_form, 
+            #     }
 
             return render(request, template, context)
         return redirect('login')
 
     def post(self, request):
         if request.user.is_authenticated:
-            user = request.user
-            if not user.company:
-                user_form = ApplicantEditForm(
-                    instance=user, 
-                    data=request.POST
-                )
+            have_errors = False
+            if request.user.is_applicant:
+                applicant = request.user.applicant
+            # else:
+            #     employer = request.user
+            #     user_form = EmployerEditForm(
+            #         instance=employer, 
+            #         data=request.POST
+            #     )
+            #     profile_form = EmployerProfileForm(
+            #         instance=employer, 
+            #         data=request.POST, 
+            #     )
+
+                # USER_FORM
+                if 'first_name' in request.POST:
+                    user_form = ApplicantEditForm(
+                        instance=request.user,
+                        data=request.POST,
+                    )
+                    if user_form.is_valid():
+                        user_form.save()
+                    for error in user_form.errors:
+                        messages.error(request, user_form.errors[error])
+                        have_errors = True
+
+                # PROFILE_FORM
                 profile_form = ApplicantProfileForm(
-                    instance=user.applicant, 
-                    data=request.POST, 
-                    files=request.FILES
+                    instance=applicant,
+                    data=request.POST,
                 )
+                if profile_form.is_valid():
+                    profile_form.save()
+                for error in profile_form.errors:
+                    messages.error(request, profile_form.errors[error])
+                    have_errors = True
+
+                # EDUCATION_FORM
                 education_form = EducationForm(
-                    instance=request.user.applicant, 
-                    data=request.POST
+                    instance=applicant,
+                    data=request.POST,
                 )
-            else:
-                user_form = EmployerEditForm(instance=user, data=request.POST)
-                profile_form = EmployerProfileForm(
-                    instance=user.employer, 
-                    data=request.POST, 
-                    files=request.FILES
-                )
+                if education_form.is_valid():
+                    education_form.save()
 
-            if user_form.is_valid():
-                user_form.save()
-            if profile_form.is_valid():
-                profile_form.save()
+                # EXPERIENCE_FORM                    
+                if 'form-0-position' in request.POST:
+                    experience_formset = modelformset_factory(Experience, form=ExperienceForm)
+                    experience_forms = experience_formset(request.POST)
+                    if experience_forms.is_valid():
+                        experience_forms.save(commit=False)
+                        for form in experience_forms:
+                            form.instance.applicant = applicant
+                            form.save()
+                    for form in experience_forms:
+                        for error in form.errors:
+                            messages.error(request, form.errors[error])
+                            have_errors = True
+                
+                if 'position' in request.POST:
+                    experience_form = ExperienceForm(request.POST)
+                    if experience_form.is_valid():
+                        experience_form.save(commit=False)
+                        experience_form.instance.applicant = applicant
+                        experience_form.save()
+                    for error in experience_form.errors:
+                        messages.error(request, experience_form.errors[error])
+                        have_errors = True
+                
+                # LANGUAGE_FORM
+                if 'language' in request.POST:
+                    language_form = LanguageForm(request.POST)
+                    if language_form.is_valid():
+                        cd = language_form.cleaned_data
+                        lang = cd['language']
+                        lvl = cd['level']
+                        if lang: 
+                            new_lang, created = Language.objects.get_or_create(
+                                language=lang, level=lvl
+                            )
+                            if created:
+                                new_lang.save()
+                                new_lang.applicant.add(applicant)
+                            else:
+                                new_lang.applicant.add(applicant)
+                    for error in language_form.errors:
+                        messages.error(request, language_form.errors[error])
+                        have_errors = True
+                if 'form-0-language' in request.POST:
+                    language_formset = modelformset_factory(Language, form=LanguageForm)
+                    language_forms = language_formset(request.POST)
+                    if language_forms.is_valid():
+                        for form in language_forms:
+                            cd = form.cleaned_data
+                            lang = cd.get('language')
+                            lvl = cd.get('level')
+                            if not lang:
+                                continue
+                            new_lang, created = Language.objects.get_or_create(
+                                language=lang, level=lvl
+                            )
+                            entries = ApplicantLanguage.objects.filter(applicant_id=applicant.id)
+                            if entries.exists():
+                                language = Language.objects.filter(language=lang, applicant=applicant).first()
+                                if language:
+                                    if language.level != lvl:
+                                        language.applicant.remove(applicant)
+                                        new_lang.applicant.add(applicant)
+                                else:
+                                    new_lang.applicant.add(applicant)
+                            else:
+                                new_lang.applicant.add(applicant)
+                                        
+                    for form in language_forms:
+                        for error in form.errors:
+                            messages.error(request, form.errors[error])
+                            have_errors = True
 
-            # if user_form.has_changed() or profile_form.has_changed():
-
-            has_errors = False
-            for error in user_form.errors:
-                messages.error(request, user_form.errors[error])
-                has_errors = True
-            for error in profile_form.errors:
-                messages.error(request, profile_form.errors[error])
-                has_errors = True
-            
-            if not has_errors:
+            if not have_errors:
                 messages.success(
                     request,
                     mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
                 )
-        
-            # return redirect('profile', user.id)
-            return redirect('edit_personal')
+            # print(request.POST)
+            return redirect(reverse('edit_personal') + f'?cat=')
         return redirect('login')
 
 
@@ -223,6 +325,7 @@ class EditEducationView(View):
         if request.user.is_authenticated:
             user = User.objects.get(pk=request.user.id)
             form = EducationForm(instance=request.user.applicant, data=request.POST)
+            print(request.POST)
             if form.is_valid():
                 form.save()
 

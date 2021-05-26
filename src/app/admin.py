@@ -4,13 +4,13 @@ from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.contrib.auth.models import Permission, Group
 
-from .models import Applicant, Employer, Experience, Vacancy, User
+from .models import Applicant, Employer, Experience, Vacancy, User, Language, ApplicantLanguage
 
 
 class ApplicantInline(admin.TabularInline): # or admin.StackedInline
     model = Applicant
     readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship', 
-                        'education', 'specialization', 'skills', 'languages')
+                        'education', 'specialization')#, 'skills', 'languages')
 
     def get_image(self, obj):
         try:
@@ -104,11 +104,11 @@ class ApplicantAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_image')
     list_display_links = ('user', 'get_image')
     list_filter = ('photo','birthday', 'location', 'citizenship', 'education', 
-                    'specialization', 'skills', 'languages')
+                    'specialization')#, 'skills', 'languages')
     search_fields = ('photo','birthday', 'location', 'citizenship', 'education', 
-                    'specialization', 'skills', 'languages', 'user__first_name')
+                     'specialization', 'user__first_name')#, 'skills', 'languages', )
     readonly_fields = ('user', 'photo', 'get_image', 'birthday', 'location', 'citizenship', 
-                        'education','specialization', 'skills', 'languages')
+                        'education', 'specialization')#, 'skills', 'languages')
     #inlines = [ExperienceInline]
 
     def get_image(self, obj):
@@ -189,6 +189,10 @@ class GroupAdmin(admin.ModelAdmin):
 
     get_users.short_description = 'Пользователи'
 
+
+admin.site.register(Language)
+admin.site.register(ApplicantLanguage)
+admin.site.register(Experience)
 
 
 

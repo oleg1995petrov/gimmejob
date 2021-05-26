@@ -10,8 +10,10 @@ from PIL import Image
 import os
 
 
-from .models import User, Applicant, Employer, Experience, Vacancy
+from .models import User, Applicant, Employer, Experience, Vacancy, Language
 from .choices import *
+from .widgets import MonthYearWidget
+from app import services, widgets
 
 
 # help_text=password_validation.password_validators_help_text_html())
@@ -82,13 +84,15 @@ class ApplicantEditForm(forms.ModelForm):
         errors = []
         fn = cd.get('first_name')
         ln = cd.get('last_name')
+
         if not fn.isalpha():
             errors.append(forms.ValidationError('Имя может содержать только буквы.'))
 
         if not ln.isalpha():
             errors.append(forms.ValidationError('Фамилия может содержать только буквы.'))
         
-        raise forms.ValidationError([errors])
+        if errors:
+            raise forms.ValidationError([errors])
 
 
 class ApplicantProfileForm(forms.ModelForm):
@@ -148,16 +152,16 @@ class EducationForm(forms.ModelForm):
 
 
 class ExperienceForm(forms.ModelForm):
-    begin = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='Beginning of work') 
-    now = forms.BooleanField(label='To this day', required=False)
-    end = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='Ending', required=False)
-    company = forms.CharField(label='Company')
-    company_site = forms.URLField(label='Company site', required=False)
-    company_spheres = forms.MultipleChoiceField(
-        choices=SPHERES, widget=forms.CheckboxSelectMultiple(), label='Scopes of the company'
-    )
-    position = forms.ChoiceField(choices=SPECIALIZATION)
-    responsibilities = forms.CharField(widget=CKEditorWidget(), label='Workplace responsibilities')
+    # begin = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='C') 
+    now = forms.BooleanField(label='На данный момент я работаю в этой должности', required=False)
+    # end = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='По', required=False)
+    # company = forms.CharField(label='Company')
+    # position = forms.CharField(label="Должность")
+    # responsibilities = forms.CharField(widget=CKEditorWidget(), label='Описание')
+
+    begin = forms.DateField(widget=MonthYearWidget(years=WORK_YEARS)) 
+    end = forms.DateField(widget=MonthYearWidget(years=WORK_YEARS), required=False)
+    # responsibilities = forms.CharField(widget=CKEditorWidget())
 
     class Meta:
         model = Experience
@@ -195,6 +199,38 @@ class LanguagesForm(forms.ModelForm):
         model = Applicant
         fields = ('languages',)
 
+
+class LanguageForm(forms.ModelForm):
+    language = forms.CharField(
+        widget=forms.Select(choices=LANGUAGES), 
+        label='Язык',
+        required=False
+    )
+    level = forms.CharField(
+        widget=forms.Select(choices=LANGUAGE_LEVELS), 
+        label='Уровень знания',
+        required=False
+    )
+
+    class Meta:
+        model = Language
+        fields = ('language', 'level')
+        # labels = {
+        #     'language': 'Язык',
+        #     'level': 'Уровень знания'
+        # }
+        # widgets = {
+        #     'language': forms.Select(attrs={
+        #         'choices': LANGUAGES,
+        #     }),
+        #     'level': forms.Select(attrs={
+        #         'choices': LANGUAGE_LEVELS
+        #     })
+        # }
+    
+    def __lt__(self, other):
+        if self.level:
+            return self.level < other.id
 
 # EMPLOYEER 
 

@@ -2,7 +2,10 @@ from django.core.mail import send_mail
 from django.conf import settings
 import os
 
+from django.http import request
+
 from . import models
+import app
 
 def send_mail_registration(user):
     if user.company:
@@ -27,3 +30,17 @@ def rename_avatar(instance, filename):
 
 def get_next_path(request):
     return f'?next={request.get_full_path()}'
+
+
+# Test|Not used
+def get_languages(languages_list):
+    LANGUAGES = languages_list
+    app_langs = request.user.applicant.languages.all()
+
+    for lang in app_langs:
+        for l in LANGUAGES:
+            if lang == l[0]:
+                LANGUAGES.remove(lang)
+    
+    return LANGUAGES
+#

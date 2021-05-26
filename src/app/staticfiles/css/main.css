@@ -1,6 +1,6 @@
 body {
     background-color: #eeedf0;
-    font-family: Verdana, sans-serif;
+    font-family: sans-serif, Verdana;
     font-size: 13px;
     overflow-y: scroll;
 }
@@ -17,7 +17,7 @@ header {
     color: #000;
     font-size: 16px;
     z-index: 1;
-    box-shadow: 0 0 1px rgba(161, 161, 161, 0.5);
+    box-shadow: 0 1px 0 0 #dce1e6;
 }
 
 nav {
@@ -219,12 +219,16 @@ main i:hover {
     background: #fff;
     border-radius: 4px;
     margin-bottom: 15px;
-    box-shadow: 0 1px 0 0 #dce1e6;
+    box-shadow: 1px 1px 1px 1px #dce1e6, 0 1px 0 0 #e7e8ec;
 }
 
 .separator {
     margin: 15px 0 0;
     border-top: 1px solid #d3d9de;
+}
+
+.separator-15 {
+    margin: 15px 0 0;
 }
 
 .profile-group {
@@ -337,8 +341,8 @@ main i:hover {
 }
 
 .hr-value {
-    border: 5px solid #dce1e6;
-    /* width: 30%; */
+    border-top: 2px solid #fff;
+    margin-left: 165px;
 }
 
 .text-muted {
@@ -375,7 +379,7 @@ main i:hover {
     padding-top: 20px;
 }
 
-/* .form-row {
+.form-row {
     height: 45px;
     padding-bottom: 15px;
     overflow: hidden;
@@ -384,7 +388,6 @@ main i:hover {
 .form-row-label {
     float: left;
     width: 180px;
-    height: 30px;
     padding-right: 10px;
     line-height: 30px;
     text-align: right;
@@ -399,11 +402,12 @@ main i:hover {
 .form-row input, select {
     width: 280px;
     height: 30px;
+    line-height: 30px;
     padding: 6px 10px;
     border: 1px solid #d3d9de;
     border-radius: 4px;
     background-color: #fff;
-} */
+}
 
 .select-birthday select {
     width: 93px;

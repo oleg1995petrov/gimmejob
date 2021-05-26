@@ -1,6 +1,7 @@
 from django.db.models import Count
 
 from .models import Vacancy
+from . import services
 
 
 class VacancyFilterMixin:
@@ -21,21 +22,21 @@ class VacancyFilterMixin:
 
     def get_vacancy_experience(self):
         EXPERIENCE = {}
-        for i in Vacancy.EXPERIENCE:
+        for i in services.EXPERIENCE:
             EXPERIENCE[i[1]] = i[0]
 
         return EXPERIENCE
     
     def get_vacancy_employment(self):
         EMPLOYMENT = {}
-        for i in Vacancy.EMPLOYMENT:
+        for i in services.EMPLOYMENT:
             EMPLOYMENT[i[1]] = i[0]
 
         return EMPLOYMENT
 
     def get_vacancy_schedule(self):
         SCHEDULE = {}
-        for i in Vacancy.SCHEDULE:
+        for i in services.SCHEDULE:
             SCHEDULE[i[1]] = i[0]
 
         return SCHEDULE
