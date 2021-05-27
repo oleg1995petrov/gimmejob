@@ -149,7 +149,7 @@ class Language(models.Model):
         
 
 class ApplicantLanguage(models.Model):
-    
+
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
 
@@ -188,11 +188,11 @@ class Vacancy(models.Model):
     published = models.DateTimeField('Опубликовано', default=timezone.now)
     active = models.BooleanField('Публиковать?')
     position = models.CharField('Должность', max_length=100)
-    experience = models.CharField('Требуемый опыт работы', max_length=50, choices=EXPERIENCE)
-    employment = MultiSelectField('Тип занятости', max_length=100, choices=EMPLOYMENT)
-    schedule = MultiSelectField('График работы', max_length=100, choices=SCHEDULE)
+    experience = models.CharField('Требуемый опыт работы', max_length=50, choices=choices.EXPERIENCE)
+    employment = MultiSelectField('Тип занятости', max_length=100, choices=choices.EMPLOYMENT)
+    schedule = MultiSelectField('График работы', max_length=100, choices=choices.SCHEDULE)
     salary = models.PositiveSmallIntegerField('Уровень дохода', null=True)
-    currency = models.CharField('Валюта', max_length=3, choices=CURRENCY, default='')
+    currency = models.CharField('Валюта', max_length=3, choices=choices.CURRENCY, default='')
     body = models.TextField('Описание вакансии')
     
     class Meta:

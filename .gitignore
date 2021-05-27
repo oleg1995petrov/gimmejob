@@ -130,5 +130,7 @@ dmypy.json
 
 #custom
 .vscode/
+.srs/app/migrations/
+.srs/app/staticfiles/
 src/templates/
 src/src/settings.py
