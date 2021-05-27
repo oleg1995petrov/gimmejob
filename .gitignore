@@ -128,9 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#custom
+#Custom
 .vscode/
-.srs/app/migrations/
-.srs/app/staticfiles/
+.src/media/
+.src/app/migrations/
+.src/app/staticfiles/
 src/templates/
 src/src/settings.py
