@@ -25,38 +25,31 @@ def get_work_period(exp):
     begin = exp.begin
     month_begin = begin.month
     year_begin = begin.year
-
-    now = exp.now
-    if now:
-        month_now = date.today().month
-        year_now = date.today().year
-
     end = exp.end
+
     if end:
         month_end = end.month
         year_end = end.year
-
-    if now:
-        num_calendar_years = year_now - year_begin
     else:
-        num_calendar_years = year_end - year_begin
+        month_end = date.today().month
+        year_end = date.today().year
 
-    if not num_calendar_years:
-        if now:
-            num_months = month_now - month_begin + 1
-        else:
-            num_months = month_end - month_begin + 1
-    else:
-        if now:
-            num_months = month_now + num_calendar_years * 12 + 1 - month_begin
-        else:
-            num_months = month_end + num_calendar_years * 12 + 1 - month_begin
+    num_years = year_end - year_begin
+    num_months = (month_end - month_begin) + 1
+
+    if num_years:
+        num_months += (num_years * 12) - 1
 
     years = num_months // 12
     months = num_months % 12
 
-    if years:
+    if years and months:
         res = f'{years} г. {months} мес.'
+    elif years:
+        if years % 10 in [1, 2, 3, 4] and years not in [11, 12, 13, 14]:
+            res = f'{years} г'
+        else:
+            res = f'{years} л'
     else:
         res = f'{months} мес.'
     return res

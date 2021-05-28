@@ -160,18 +160,17 @@ class Experience(models.Model):
     """ """
 
     applicant = models.ForeignKey(Applicant, verbose_name='Соискатель', on_delete=models.CASCADE, related_name='experience')
-    begin = models.DateField('С')
-    now = models.BooleanField('На данный момент я работаю в этой должности', null=True, blank=True)
-    end = models.DateField('По', null=True, blank=True)
-    company = models.CharField('Компания', max_length=100, default='', blank=True)
+    position = models.CharField('Должность', max_length=100, default='', blank=True)
     employment = models.CharField('Тип занятости', max_length=50, choices=choices.EMPLOYMENT, default='')
-    position = models.CharField('Должность', max_length=100)
-    responsibilities = models.TextField('Описание', default='', blank=True)
-
+    company = models.CharField('Компания', max_length=100, default='', blank=True)
+    begin = models.DateField('С')
+    end = models.DateField('По', null=True, blank=True)
+    description = models.TextField('Описание', default='', blank=True)
+    
     class Meta:
         verbose_name = 'Опыт работы'
         verbose_name_plural = 'Опыт работы'
-        ordering = ['-id']
+        ordering = ['-begin', '-end', '-id']
 
     def __str__(self):
         return f'Experience of Applicant-{self.applicant.id}'
@@ -192,7 +191,7 @@ class Vacancy(models.Model):
     employment = MultiSelectField('Тип занятости', max_length=100, choices=choices.EMPLOYMENT)
     schedule = MultiSelectField('График работы', max_length=100, choices=choices.SCHEDULE)
     salary = models.PositiveSmallIntegerField('Уровень дохода', null=True)
-    currency = models.CharField('Валюта', max_length=3, choices=choices.CURRENCY, default='')
+    currency = models.CharField('Валюта', max_length=3, choices=choices.CURRENCIES, default='')
     body = models.TextField('Описание вакансии')
     
     class Meta:

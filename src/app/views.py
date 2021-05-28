@@ -29,7 +29,6 @@ from . import services
 from .forms import *
 from .mixins import VacancyFilterMixin
 from .models import Applicant, Employer, Experience, User, Vacancy, Language, ApplicantLanguage
-import app
 
 
 class HomeView(View):
@@ -116,8 +115,7 @@ class EditPersonalView(View):
                     context['experience_form'] = ExperienceForm()
                 
                 if applicant.languages.exists():
-                    LangForm = LanguageForm#.language.widget.attrs.update({'choices': services.get_languages(LANGUAGES)})
-                    language_formset = modelformset_factory(Language, form=LangForm, extra=1)
+                    language_formset = modelformset_factory(Language, form=LanguageForm, extra=1)
                     language_forms = language_formset(queryset=Language.objects.filter(applicant=applicant))
                     context['language_forms'] = language_forms
                 else:
@@ -153,7 +151,7 @@ class EditPersonalView(View):
             #         data=request.POST, 
             #     )
 
-                # USER_FORM
+                # USER_FORM & PROFILE_FORM
                 if 'first_name' in request.POST:
                     user_form = ApplicantEditForm(
                         instance=request.user,
@@ -165,24 +163,28 @@ class EditPersonalView(View):
                         messages.error(request, user_form.errors[error])
                         have_errors = True
 
-                # PROFILE_FORM
-                profile_form = ApplicantProfileForm(
-                    instance=applicant,
-                    data=request.POST,
-                )
-                if profile_form.is_valid():
-                    profile_form.save()
-                for error in profile_form.errors:
-                    messages.error(request, profile_form.errors[error])
-                    have_errors = True
+                    profile_form = ApplicantProfileForm(
+                        instance=applicant,
+                        data=request.POST,
+                    )
+                    if profile_form.is_valid():
+                        profile_form.save()
+                    for error in profile_form.errors:
+                        messages.error(request, profile_form.errors[error])
+                        have_errors = True
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal'))
 
                 # EDUCATION_FORM
-                education_form = EducationForm(
-                    instance=applicant,
-                    data=request.POST,
-                )
-                if education_form.is_valid():
-                    education_form.save()
+                if 'education' in request.POST:
+                    education_form = EducationForm(
+                        instance=applicant,
+                        data=request.POST,
+                    )
+                    if education_form.is_valid():
+                        education_form.save()
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal') + f'?cat=education')
 
                 # EXPERIENCE_FORM                    
                 if 'form-0-position' in request.POST:
@@ -191,12 +193,18 @@ class EditPersonalView(View):
                     if experience_forms.is_valid():
                         experience_forms.save(commit=False)
                         for form in experience_forms:
+                            cd = form.cleaned_data
+                            begin = cd.get('begin')
+                            if not begin:
+                                continue
                             form.instance.applicant = applicant
                             form.save()
                     for form in experience_forms:
                         for error in form.errors:
                             messages.error(request, form.errors[error])
                             have_errors = True
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal') + f'?cat=career')
                 
                 if 'position' in request.POST:
                     experience_form = ExperienceForm(request.POST)
@@ -207,6 +215,8 @@ class EditPersonalView(View):
                     for error in experience_form.errors:
                         messages.error(request, experience_form.errors[error])
                         have_errors = True
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal') + f'?cat=career')
                 
                 # LANGUAGE_FORM
                 if 'language' in request.POST:
@@ -219,14 +229,12 @@ class EditPersonalView(View):
                             new_lang, created = Language.objects.get_or_create(
                                 language=lang, level=lvl
                             )
-                            if created:
-                                new_lang.save()
-                                new_lang.applicant.add(applicant)
-                            else:
-                                new_lang.applicant.add(applicant)
+                            new_lang.applicant.add(applicant)
                     for error in language_form.errors:
                         messages.error(request, language_form.errors[error])
                         have_errors = True
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal') + f'?cat=languages')
                 if 'form-0-language' in request.POST:
                     language_formset = modelformset_factory(Language, form=LanguageForm)
                     language_forms = language_formset(request.POST)
@@ -256,14 +264,15 @@ class EditPersonalView(View):
                         for error in form.errors:
                             messages.error(request, form.errors[error])
                             have_errors = True
+                    services.message_succes(request, have_errors=have_errors)
+                    return redirect(reverse('edit_personal') + f'?cat=languages')
 
-            if not have_errors:
-                messages.success(
-                    request,
-                    mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
-                )
+            # if not have_errors:
+            #     messages.success(
+            #         request,
+            #         mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
+            #     )
             # print(request.POST)
-            return redirect(reverse('edit_personal') + f'?cat=')
         return redirect('login')
 
 

@@ -11,7 +11,7 @@ YEARS = [year for year in range(YEAR_MIN, YEAR_MAX, -1)]
 WORK_YEARS = [year for year in range(YEAR_NOW, YEAR_MIN_WORK, -1)]
 
 LOCATION2 = [
-    (None, '------------'),
+    (None, '---'),
     (('Belarus'), (
         ('Brest', _('Brest')),
         ('Hrodna', _('Hrodna')),
@@ -49,7 +49,7 @@ LOCATION2 = [
 ]
 
 LOCATION = [
-    (None, '------------'),
+    (None, '---'),
     (('Беларусь'), (
         ('Brest', _('Brest')),
         ('Hrodna', _('Hrodna')),
@@ -87,7 +87,7 @@ LOCATION = [
 ]
 
 LANGUAGES = [
-    (None, '------------'),
+    (None, '---'),
     ('Русский', _('Русский')),
     ('Беларусский', _('Беларусский')),
     ('Английский', _('Английский')),
@@ -120,7 +120,7 @@ LANGUAGES2 = [
 ]
 
 LANGUAGE_LEVELS = [
-    (None, '------------'),
+    (None, '---'),
     ('A1', _('A1')),
     ('A2', _('A2')),
     ('B1', _('B1')),
@@ -130,7 +130,7 @@ LANGUAGE_LEVELS = [
 ]
 
 COUNTRIES2 = [
-    (None, '------------'),
+    (None, '---'),
     ('Belarus', 'Belarus'),
     ('Russia', 'Russia'),
     ('Ukraine', 'Ukraine'),
@@ -141,7 +141,7 @@ COUNTRIES2 = [
 ]
 
 COUNTRIES = [
-    (None, '------------'),
+    (None, '---'),
     ('Беларусь', 'Беларусь'),
     ('Russia', 'Russia'),
     ('Ukraine', 'Ukraine'),
@@ -186,7 +186,7 @@ SPHERES = [
 ]
 
 EDUCATION = [
-    (None, '------------'),
+    (None, '---'),
     ('High School Diploma', _('High school diploma')),
     ("Associate degree", _("Associate’s degree")),
     ("Бакалавр", _("Бакалавр")),
@@ -195,7 +195,7 @@ EDUCATION = [
 ]
 
 EDUCATION2 = [
-    (None, '------------'),
+    (None, '---'),
     ('High School Diploma', _('High school diploma')),
     ("Associate degree", _("Associate’s degree")),
     ("Bachelor's degree", _("Bachelor's degree")),
@@ -204,7 +204,7 @@ EDUCATION2 = [
 ]
 
 SPECIALIZATION = [
-    (None, '------------'),
+    (None, '---'),
     ('Экономист', _('Экономист')),
     ('Lawyer', _('Lawyer')),
     ('Инженер', _('Инженер')),
@@ -217,7 +217,7 @@ SPECIALIZATION = [
 ]
 
 SPECIALIZATION2 = [
-    (None, '------------'),
+    (None, '---'),
     ('Economist', _('Economist')),
     ('Lawyer', _('Lawyer')),
     ('Engineer', _('Engineer')),
@@ -237,6 +237,7 @@ EXPERIENCE = (
 )
 
 EMPLOYMENT = (
+    (None, '---'),
     ('ftime', _('Полная занятость')),
     ('ptime', _('Частичная занятость')),
     ('trainee', _('Стажировка')),
@@ -252,8 +253,8 @@ SCHEDULE = (
     ('remote', _('Удаленная работа'))
 )
 
-CURRENCY = (
-    (None, '-'),
+CURRENCIES = (
+    (None, '---'),
     ('BYN', 'BYN'),
     ('RUB', 'RUB'),
     ('USD', 'USD'),

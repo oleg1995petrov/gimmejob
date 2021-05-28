@@ -9,11 +9,13 @@ from ckeditor.widgets import CKEditorWidget
 from PIL import Image
 import os
 
+from django.http import request
+from django.forms.utils import ErrorDict
 
+from . import services, choices
 from .models import User, Applicant, Employer, Experience, Vacancy, Language
-from .choices import *
 from .widgets import MonthYearWidget
-from app import services, widgets
+
 
 
 # help_text=password_validation.password_validators_help_text_html())
@@ -98,17 +100,17 @@ class ApplicantEditForm(forms.ModelForm):
 class ApplicantProfileForm(forms.ModelForm):
     birthday = forms.DateField(
         label='День рождения:',
-        widget=forms.SelectDateWidget(years=YEARS),
+        widget=forms.SelectDateWidget(years=choices.YEARS),
         required=False
     ) 
     location = forms.CharField(
         label='Город',
-        widget=forms.Select(choices=LOCATION), 
+        widget=forms.Select(choices=choices.LOCATION),
         required=False
     )
     citizenship = forms.CharField(
         label='Гражданство',
-        widget=forms.Select(choices=COUNTRIES), 
+        widget=forms.Select(choices=choices.COUNTRIES),
         required=False
     )
 
@@ -143,8 +145,8 @@ class PhotoForm(forms.ModelForm):
     
 
 class EducationForm(forms.ModelForm):
-    education = forms.CharField(widget=forms.Select(choices=EDUCATION), label='Degree', required=False)
-    specialization = forms.CharField(widget=forms.Select(choices=SPECIALIZATION), required=False)
+    education = forms.CharField(widget=forms.Select(choices=choices.EDUCATION), label='Degree', required=False)
+    specialization = forms.CharField(widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
 
     class Meta:
         model = Applicant
@@ -152,16 +154,14 @@ class EducationForm(forms.ModelForm):
 
 
 class ExperienceForm(forms.ModelForm):
-    # begin = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='C') 
-    now = forms.BooleanField(label='На данный момент я работаю в этой должности', required=False)
-    # end = forms.DateField(widget=forms.SelectDateWidget(years=WORK_YEARS), label='По', required=False)
-    # company = forms.CharField(label='Company')
-    # position = forms.CharField(label="Должность")
-    # responsibilities = forms.CharField(widget=CKEditorWidget(), label='Описание')
-
-    begin = forms.DateField(widget=MonthYearWidget(years=WORK_YEARS)) 
-    end = forms.DateField(widget=MonthYearWidget(years=WORK_YEARS), required=False)
-    # responsibilities = forms.CharField(widget=CKEditorWidget())
+   
+    position = forms.CharField(label="Должность", widget=forms.TextInput())
+    employment = forms.CharField(label='Тип занятости', widget=forms.Select(choices=choices.EMPLOYMENT), required=False)
+    company = forms.CharField(label='Компания', required=False)
+    begin = forms.DateField(label='C', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
+    end = forms.DateField(label='По', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
+    # description = forms.CharField(label='Описание', widget=forms.Textarea())#, required=False)
+    
 
     class Meta:
         model = Experience
@@ -169,16 +169,21 @@ class ExperienceForm(forms.ModelForm):
 
     def clean(self):
         cd = super().clean()
-        begin, now, end = cd['begin'], cd.get('now'), cd.get('end')
-        if not (begin and end and not now and end >= begin) and not (begin and now and not end):
-            raise forms.ValidationError('Что-то не так с датами!')
+        self._errors = ErrorDict()
+        begin = cd.get('begin')
+        position = cd.get('position')
+        if not position:
+            self.add_error('position', 'Заполните поле "Должность"')
+        if not begin:
+            self.add_error('position', 'Заполните поле "C"')
 
+            
 
 class SkillsForm(forms.ModelForm):
     skills = forms.MultipleChoiceField(
         label='',
         required=False,
-        choices=SKILLS,
+        choices=choices.SKILLS,
         widget=forms.CheckboxSelectMultiple()
     )
 
@@ -191,7 +196,7 @@ class LanguagesForm(forms.ModelForm):
     languages = forms.MultipleChoiceField(
         label='',
         required=False,
-        choices=LANGUAGES, 
+        choices=choices.LANGUAGES,
         widget=forms.CheckboxSelectMultiple()
     )
 
@@ -202,16 +207,16 @@ class LanguagesForm(forms.ModelForm):
 
 class LanguageForm(forms.ModelForm):
     language = forms.CharField(
-        widget=forms.Select(choices=LANGUAGES), 
+        widget=forms.Select(choices=choices.LANGUAGES),
         label='Язык',
         required=False
     )
     level = forms.CharField(
-        widget=forms.Select(choices=LANGUAGE_LEVELS), 
+        widget=forms.Select(choices=choices.LANGUAGE_LEVELS),
         label='Уровень знания',
         required=False
     )
-
+            
     class Meta:
         model = Language
         fields = ('language', 'level')
@@ -227,10 +232,6 @@ class LanguageForm(forms.ModelForm):
         #         'choices': LANGUAGE_LEVELS
         #     })
         # }
-    
-    def __lt__(self, other):
-        if self.level:
-            return self.level < other.id
 
 # EMPLOYEER 
 
@@ -327,7 +328,7 @@ class EmployerProfileForm(forms.ModelForm):
     company_spheres = forms.MultipleChoiceField(
         required=True, 
         label='Company scopes',
-        choices=SPHERES, 
+        choices=choices.SPHERES,
         widget=forms.CheckboxSelectMultiple(), 
     )
 
@@ -359,7 +360,7 @@ class EmployerProfileForm(forms.ModelForm):
 
 class VacancyForm(forms.ModelForm):
     salary = forms.IntegerField(required=False, min_value=0, label='Уровень оплаты')
-    currency = forms.ChoiceField(choices=CURRENCY, label='Валюта', required=False)
+    currency = forms.ChoiceField(choices=choices.CURRENCIES, label='Валюта', required=False)
     body = forms.CharField(widget=CKEditorWidget(), label='Описание вакансии')
     # schedule = forms.ChoiceField(choices=Vacancy.VacancySchedule.choices, widget=forms.CheckboxSelectMultiple(), label='Валюта', required=False)
     
@@ -415,7 +416,8 @@ class PasswordResetForm(PasswordResetForm):
 class PasswordSetForm(SetPasswordForm):
     password1 = forms.CharField(
         label='New password', 
-        strip=False, min_length=8, 
+        strip=False, 
+        min_length=8, 
         widget=forms.PasswordInput(attrs={'placeholder': 'New password'})
     )
     password2 = forms.CharField(
