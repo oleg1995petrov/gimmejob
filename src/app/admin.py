@@ -4,13 +4,13 @@ from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.contrib.auth.models import Permission, Group
 
-from .models import Applicant, Employer, Experience, Vacancy, User, Language, ApplicantLanguage
+from .models import Applicant, Education, Employer, Experience, Vacancy, User, Language, ApplicantLanguage
 
 
 class ApplicantInline(admin.TabularInline): # or admin.StackedInline
     model = Applicant
-    readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship', 
-                        'education', 'specialization')#, 'skills', 'languages')
+    readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship')#, 
+                        # 'education', 'specialization', 'skills', 'languages')
 
     def get_image(self, obj):
         try:
@@ -103,12 +103,12 @@ class UserAdmin(admin.ModelAdmin):
 class ApplicantAdmin(admin.ModelAdmin):
     list_display = ('user', 'get_image')
     list_display_links = ('user', 'get_image')
-    list_filter = ('photo','birthday', 'location', 'citizenship', 'education', 
-                    'specialization')#, 'skills', 'languages')
-    search_fields = ('photo','birthday', 'location', 'citizenship', 'education', 
-                     'specialization', 'user__first_name')#, 'skills', 'languages', )
-    readonly_fields = ('user', 'photo', 'get_image', 'birthday', 'location', 'citizenship', 
-                        'education', 'specialization')#, 'skills', 'languages')
+    list_filter = ('photo','birthday', 'location', 'citizenship')#, 'education', 
+                    # 'specialization'), 'skills', 'languages')
+    search_fields = ('photo', 'birthday', 'location', 'citizenship', 'user__first_name')#, 'education',
+                    #  'specialization', 'skills', 'languages', )
+    readonly_fields = ('user', 'photo', 'get_image', 'birthday', 'location', 'citizenship')#, 
+                        # 'education', 'specialization', 'skills', 'languages')
     #inlines = [ExperienceInline]
 
     def get_image(self, obj):
@@ -192,6 +192,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 admin.site.register(Language)
 admin.site.register(ApplicantLanguage)
+admin.site.register(Education)
 admin.site.register(Experience)
 
 

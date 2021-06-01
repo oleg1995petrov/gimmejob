@@ -34,10 +34,21 @@ def get_next_path(request):
     return f'?next={request.get_full_path()}'
 
 
-def message_succes(request, have_errors=False):
-    if not have_errors:
+def get_languages(applicant):
+    LANGUAGES = choices.LANGUAGES 
+    applicant_langs = [lang.language for lang in models.Language.objects.filter(applicant=applicant)]
+    if applicant_langs:
+        for _ in range(len(applicant_langs)):
+            for lang in LANGUAGES:
+                if lang[0] in applicant_langs:
+                    LANGUAGES.remove(lang)
+    
+    return LANGUAGES
+
+
+def message_succes(request, has_errors=False):
+    if not has_errors:
         messages.success(
             request,
-            mark_safe(
-                '<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
+            mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
         )

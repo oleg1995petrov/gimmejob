@@ -8,13 +8,14 @@ from ckeditor.widgets import CKEditorWidget
 
 from PIL import Image
 import os
+from django.forms import fields
 
 from django.http import request
 from django.forms.utils import ErrorDict
 
 from . import services, choices
-from .models import User, Applicant, Employer, Experience, Vacancy, Language
-from .widgets import MonthYearWidget
+from .models import User, Applicant, Employer, Education, Experience, Vacancy, Language, ApplicantLanguage
+from .widgets import MonthYearWidget, YearWidget
 
 
 
@@ -145,24 +146,37 @@ class PhotoForm(forms.ModelForm):
     
 
 class EducationForm(forms.ModelForm):
-    education = forms.CharField(widget=forms.Select(choices=choices.EDUCATION), label='Degree', required=False)
-    specialization = forms.CharField(widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
+    education = forms.CharField(label='Степень *', widget=forms.Select(choices=choices.DEGREE), required=False)
+    specialization = forms.CharField(label='Специализация', widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
 
     class Meta:
         model = Applicant
         fields = ('education', 'specialization')
 
 
+class EduForm(forms.ModelForm):
+
+    universiry = forms.CharField(label="Уч. заведение")
+    degree = forms.CharField(label="Степень", widget=forms.Select(choices=choices.DEGREE), required=False)
+    specialization = forms.CharField(label="Специализация", widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
+    year_start = forms.DateField(label='Год начала', widget=YearWidget(years=choices.WORK_YEARS), required=False)
+    year_end = forms.DateField(label='Год окончания ', widget=YearWidget(years=choices.WORK_YEARS), required=False)
+    description = forms.CharField(label="Описание", widget=forms.Textarea(), required=False)
+
+    class Meta:
+        model = Education
+        exclude = ('applicant',)
+   
+
 class ExperienceForm(forms.ModelForm):
    
-    position = forms.CharField(label="Должность", widget=forms.TextInput())
+    position = forms.CharField(label="Должность *")
     employment = forms.CharField(label='Тип занятости', widget=forms.Select(choices=choices.EMPLOYMENT), required=False)
-    company = forms.CharField(label='Компания', required=False)
-    begin = forms.DateField(label='C', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
-    end = forms.DateField(label='По', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
-    # description = forms.CharField(label='Описание', widget=forms.Textarea())#, required=False)
+    company = forms.CharField(label='Компания *')
+    begin = forms.DateField(label='Дата начала *', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
+    end = forms.DateField(label='Дата окончания', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
+    description = forms.CharField(label='Описание', widget=forms.Textarea(), required=False)
     
-
     class Meta:
         model = Experience
         exclude = ('applicant',)
@@ -171,12 +185,14 @@ class ExperienceForm(forms.ModelForm):
         cd = super().clean()
         self._errors = ErrorDict()
         begin = cd.get('begin')
-        position = cd.get('position')
-        if not position:
-            self.add_error('position', 'Заполните поле "Должность"')
+        end = cd.get('end')
+    
         if not begin:
-            self.add_error('position', 'Заполните поле "C"')
-
+            self.add_error('begin', 'Заполните поле "Дата начала"')
+            return
+        
+        if end and begin > end:
+            self.add_error('end', 'Укажите правильный временной период')
             
 
 class SkillsForm(forms.ModelForm):
@@ -192,24 +208,11 @@ class SkillsForm(forms.ModelForm):
         fields = ('skills',)
 
 
-class LanguagesForm(forms.ModelForm):
-    languages = forms.MultipleChoiceField(
-        label='',
-        required=False,
-        choices=choices.LANGUAGES,
-        widget=forms.CheckboxSelectMultiple()
-    )
-
-    class Meta:
-        model = Applicant
-        fields = ('languages',)
-
-
 class LanguageForm(forms.ModelForm):
+       
     language = forms.CharField(
         widget=forms.Select(choices=choices.LANGUAGES),
-        label='Язык',
-        required=False
+        label='Язык'
     )
     level = forms.CharField(
         widget=forms.Select(choices=choices.LANGUAGE_LEVELS),
@@ -219,23 +222,10 @@ class LanguageForm(forms.ModelForm):
             
     class Meta:
         model = Language
-        fields = ('language', 'level')
-        # labels = {
-        #     'language': 'Язык',
-        #     'level': 'Уровень знания'
-        # }
-        # widgets = {
-        #     'language': forms.Select(attrs={
-        #         'choices': LANGUAGES,
-        #     }),
-        #     'level': forms.Select(attrs={
-        #         'choices': LANGUAGE_LEVELS
-        #     })
-        # }
+        fields = '__all__'
+   
 
 # EMPLOYEER 
-
-
 class EmployerCreationForm(forms.ModelForm):
     # first_name = forms.CharField(
     #     label='', widget=forms.TextInput(attrs={'autofocus': True,'placeholder': 'First name'})

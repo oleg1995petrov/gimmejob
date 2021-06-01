@@ -4,6 +4,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Abstra
 from django.conf import settings
 from django.db.models.fields.related import ForeignKey, ManyToManyField
 from django.db.models.fields.related_descriptors import ManyToManyDescriptor
+from django.forms.widgets import NumberInput
 from django.utils.translation import gettext_lazy as _
 from django.utils import timezone
 from multiselectfield import MultiSelectField
@@ -86,6 +87,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Applicant(models.Model):
+
     MAX_PHOTO_SIZE = 3145728
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name='Пользователь', on_delete=models.CASCADE, related_name='applicant')
@@ -93,10 +95,9 @@ class Applicant(models.Model):
     birthday = models.DateField('Дата рождения', null=True, blank=True)
     location = models.CharField('Город проживания', max_length=50, choices=choices.LOCATION, default='',)
     citizenship = models.CharField('Гражданство', max_length=50, choices=choices.COUNTRIES, default='')
-    education = models.CharField('Уровень образования', max_length=20, choices=choices.EDUCATION, default='')
-    specialization = models.CharField('Специализация', max_length=50, choices=choices.SPECIALIZATION, default='')
-    skills = MultiSelectField('Ключевые навыки', max_length=1000, choices=choices.SKILLS, blank=True, null=True)
-    # languages = MultiSelectField('Знание языков', max_length=500, choices=choices.LANGUAGES, blank=True, null=True)
+    # education = models.CharField('Уровень образования', max_length=20, choices=choices.EDUCATION, default='')
+    # specialization = models.CharField('Специализация', max_length=50, choices=choices.SPECIALIZATION, default='')
+    # skills = MultiSelectField('Ключевые навыки', max_length=1000, choices=choices.SKILLS, blank=True, null=True)
     languages = ManyToManyField('Language', through='ApplicantLanguage', verbose_name='Языки', related_name='applicant')
 
     class Meta:
@@ -111,6 +112,7 @@ class Applicant(models.Model):
 
 
 class Employer(models.Model):
+
     MAX_PHOTO_SIZE = 1048576
     
     user = models.OneToOneField(settings.AUTH_USER_MODEL, verbose_name='Пользователь', on_delete=models.CASCADE, related_name='employer')
@@ -130,7 +132,7 @@ class Employer(models.Model):
     def get_absolute_url(self):
         return reverse('profile', kwargs={'pk': self.user.id})
 
-### LANGUAGES
+### LANGUAGE
 
 class Language(models.Model):
 
@@ -153,19 +155,29 @@ class ApplicantLanguage(models.Model):
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE)
     language = models.ForeignKey(Language, on_delete=models.CASCADE)
 
-### LANGUAGES
+### LANGUAGE
+
+
+class Education(models.Model):
+    applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, verbose_name='Соискатель', related_name='education')
+    universiry = models.CharField('Уч. заведение', max_length=200, default='')
+    degree = models.CharField('Степень', max_length=100, default='', blank=True)
+    specialization = models.CharField('Специализация', max_length=100, default='', blank=True)
+    year_start = models.DateField('Год начала', null=True, blank=True)
+    year_end = models.DateField('Год окончания (или ожидаемый)', null=True, blank=True)
+    description = models.CharField('Описание', max_length=2000, default='', blank=True)    
 
 
 class Experience(models.Model):
     """ """
 
     applicant = models.ForeignKey(Applicant, verbose_name='Соискатель', on_delete=models.CASCADE, related_name='experience')
-    position = models.CharField('Должность', max_length=100, default='', blank=True)
-    employment = models.CharField('Тип занятости', max_length=50, choices=choices.EMPLOYMENT, default='')
-    company = models.CharField('Компания', max_length=100, default='', blank=True)
+    position = models.CharField('Должность', max_length=100, default='')
+    employment = models.CharField('Тип занятости', max_length=50, choices=choices.EMPLOYMENT, default='', blank=True)
+    company = models.CharField('Компания', max_length=100, default='')
     begin = models.DateField('С')
     end = models.DateField('По', null=True, blank=True)
-    description = models.TextField('Описание', default='', blank=True)
+    description = models.CharField('Описание', max_length=2000, default='', blank=True)
     
     class Meta:
         verbose_name = 'Опыт работы'
@@ -174,6 +186,21 @@ class Experience(models.Model):
 
     def __str__(self):
         return f'Experience of Applicant-{self.applicant.id}'
+        
+    @property
+    def get_employment(self):
+        if self.employment == 'ftime':
+            return 'Полная занятость'
+        elif self.employment == 'ptime':
+            return 'Частичная занятость'
+        elif self.employment == 'trainee':
+            return 'Стажировка'
+        elif self.employment == 'profedu':
+            return 'Профессиональное обучение'
+        elif self.employment == 'business':
+            return 'Предприниматель'
+        elif self.employment == 'free':
+            return 'Фриланс'
 
 
 class Vacancy(models.Model):

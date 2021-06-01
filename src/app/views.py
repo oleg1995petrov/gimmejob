@@ -12,6 +12,7 @@ from django.contrib.auth.views import logout_then_login
 # from django.contrib.sites.shortcuts import get_current_site
 from django.core.exceptions import ValidationError
 from django.db.models import Count, Q
+from django.db.models.query import RawQuerySet
 from django.forms import formset_factory, inlineformset_factory, modelformset_factory, Select
 from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
@@ -21,6 +22,7 @@ from django.utils.encoding import force_bytes, force_str
 from django.utils.http import urlsafe_base64_decode, urlsafe_base64_encode
 from django.utils.safestring import mark_safe
 from django.utils.translation import gettext_lazy as _
+from django.views import generic
 from django.views.generic import DetailView, ListView, UpdateView, View
 
 from app import widgets
@@ -28,7 +30,7 @@ from app import widgets
 from . import services
 from .forms import *
 from .mixins import VacancyFilterMixin
-from .models import Applicant, Employer, Experience, User, Vacancy, Language, ApplicantLanguage
+from .models import Applicant, Employer, Education, Experience, User, Vacancy, Language, ApplicantLanguage
 
 
 class HomeView(View):
@@ -89,6 +91,9 @@ class EditPersonalView(View):
                 applicant = request.user.applicant
                 CATEGORIES = ['education', 'career', 'skills', 'languages']
                 category = request.GET.get('cat')
+                hide = request.GET.get('hide')
+                if hide == '0' or hide:
+                    hide = int(hide)
 
                 user_form = ApplicantEditForm(instance=request.user)
                 profile_form = ApplicantProfileForm(instance=applicant)
@@ -107,19 +112,44 @@ class EditPersonalView(View):
                     'categories': CATEGORIES,
                 }
 
-                if applicant.experience.exists():
-                    experience_formset = modelformset_factory(Experience, form=ExperienceForm, extra=1)
-                    experience_forms = experience_formset(queryset=Experience.objects.filter(applicant=applicant))
-                    context['experience_forms'] = experience_forms
-                else:
-                    context['experience_form'] = ExperienceForm()
-                
-                if applicant.languages.exists():
-                    language_formset = modelformset_factory(Language, form=LanguageForm, extra=1)
-                    language_forms = language_formset(queryset=Language.objects.filter(applicant=applicant))
-                    context['language_forms'] = language_forms
-                else:
-                    context['language_form'] = LanguageForm()
+                if category == 'career':
+                    if applicant.experience.exists():
+                        experience_formset = modelformset_factory(Experience, form=ExperienceForm, extra=1)
+                        if hide:
+                            count = Experience.objects.filter(applicant=applicant).count()
+                            if hide == 0:
+                                q = Experience.objects.filter(applicant=applicant).order_by('-begin', '-end', '-id')[:count - 1]
+                            elif hide == count - 1:
+                                q = Experience.objects.filter(applicant=applicant).order_by('-begin', '-end', '-id')[1:]
+                            else:
+                                q1 = Experience.objects.filter(applicant=applicant)[:hide]
+                                q2 = Experience.objects.filter(applicant=applicant)[hide + 1:]
+                                q = q1.union(q2).order_by('-begin', '-end', '-id')
+                        else:
+                            q = Experience.objects.filter(applicant=applicant)
+                        experience_forms = experience_formset(queryset=q)#Experience.objects.filter(applicant=applicant))
+                        context['experience_forms'] = experience_forms
+                    else:
+                        context['experience_form'] = ExperienceForm()
+                elif category == 'languages':
+                    if applicant.languages.exists():
+                        language_formset = modelformset_factory(Language, form=LanguageForm, extra=1)
+                        if hide:
+                            count = Language.objects.filter(applicant=applicant).count()
+                            if hide == 0:
+                                q = Language.objects.filter(applicant=applicant)[:count - 1]
+                            elif hide == count - 1:
+                                q = Language.objects.filter(applicant=applicant)[1:]
+                            else:
+                                q1 = Language.objects.filter(applicant=applicant)[:hide]
+                                q2 = Language.objects.filter(applicant=applicant)[hide + 1:]
+                                q = q1.union(q2)
+                        else:
+                            q = Language.objects.filter(applicant=applicant)
+                        language_forms = language_formset(queryset=q)#Language.objects.filter(applicant=applicant))
+                        context['language_forms'] = language_forms
+                    else:
+                        context['language_form'] = LanguageForm()
                 
 
             # else:
@@ -137,7 +167,7 @@ class EditPersonalView(View):
 
     def post(self, request):
         if request.user.is_authenticated:
-            have_errors = False
+            has_errors = False
             if request.user.is_applicant:
                 applicant = request.user.applicant
             # else:
@@ -150,8 +180,13 @@ class EditPersonalView(View):
             #         instance=employer, 
             #         data=request.POST, 
             #     )
-
                 # USER_FORM & PROFILE_FORM
+
+                # delete_exp = request.POST.get('delete_exp')
+                # if delete_exp:
+                #     delete_exp = int(delete_exp)
+                #     Experience.objects.get(id=delete_exp).delete()
+
                 if 'first_name' in request.POST:
                     user_form = ApplicantEditForm(
                         instance=request.user,
@@ -161,7 +196,7 @@ class EditPersonalView(View):
                         user_form.save()
                     for error in user_form.errors:
                         messages.error(request, user_form.errors[error])
-                        have_errors = True
+                        has_errors = True
 
                     profile_form = ApplicantProfileForm(
                         instance=applicant,
@@ -171,8 +206,8 @@ class EditPersonalView(View):
                         profile_form.save()
                     for error in profile_form.errors:
                         messages.error(request, profile_form.errors[error])
-                        have_errors = True
-                    services.message_succes(request, have_errors=have_errors)
+                        has_errors = True
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal'))
 
                 # EDUCATION_FORM
@@ -183,7 +218,7 @@ class EditPersonalView(View):
                     )
                     if education_form.is_valid():
                         education_form.save()
-                    services.message_succes(request, have_errors=have_errors)
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal') + f'?cat=education')
 
                 # EXPERIENCE_FORM                    
@@ -195,15 +230,16 @@ class EditPersonalView(View):
                         for form in experience_forms:
                             cd = form.cleaned_data
                             begin = cd.get('begin')
-                            if not begin:
+                            position = cd.get('position')
+                            if not begin or not position:
                                 continue
                             form.instance.applicant = applicant
                             form.save()
                     for form in experience_forms:
                         for error in form.errors:
                             messages.error(request, form.errors[error])
-                            have_errors = True
-                    services.message_succes(request, have_errors=have_errors)
+                            has_errors = True
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal') + f'?cat=career')
                 
                 if 'position' in request.POST:
@@ -214,8 +250,8 @@ class EditPersonalView(View):
                         experience_form.save()
                     for error in experience_form.errors:
                         messages.error(request, experience_form.errors[error])
-                        have_errors = True
-                    services.message_succes(request, have_errors=have_errors)
+                        has_errors = True
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal') + f'?cat=career')
                 
                 # LANGUAGE_FORM
@@ -232,8 +268,8 @@ class EditPersonalView(View):
                             new_lang.applicant.add(applicant)
                     for error in language_form.errors:
                         messages.error(request, language_form.errors[error])
-                        have_errors = True
-                    services.message_succes(request, have_errors=have_errors)
+                        has_errors = True
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal') + f'?cat=languages')
                 if 'form-0-language' in request.POST:
                     language_formset = modelformset_factory(Language, form=LanguageForm)
@@ -263,17 +299,24 @@ class EditPersonalView(View):
                     for form in language_forms:
                         for error in form.errors:
                             messages.error(request, form.errors[error])
-                            have_errors = True
-                    services.message_succes(request, have_errors=have_errors)
+                            has_errors = True
+                    services.message_succes(request, has_errors=has_errors)
                     return redirect(reverse('edit_personal') + f'?cat=languages')
 
-            # if not have_errors:
+            # if not has_errors:
             #     messages.success(
             #         request,
             #         mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
             #     )
             # print(request.POST)
         return redirect('login')
+
+
+# class ExperienceDelete(View):
+#     def post(self, request, id):
+#         pk = int(id)
+#         Experience.objects.get(pk=pk).delete()
+#         return redirect(reverse('edit_personal') + f'?cat=career')
 
 
 class EditPhotoView(View):
@@ -363,164 +406,343 @@ class EditSkillsView(View):
         return redirect('profile', request.user.id)
 
 
-class EditLanguagesView(View):
-    """View for editing applicant's languages"""
+# class EditLanguagesView(View):
+#     """View for editing applicant's languages"""
+
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             form = LanguagesForm(instance=request.user.applicant)
+#             context = {
+#                 'form': form
+#             }
+
+#             return render(request, 'edit_languages.html', context)
+#         return redirect('login')
+
+#     def post(self, request):
+#         if request.user.is_authenticated:
+#             user = request.user
+#             form = LanguagesForm(instance=request.user.applicant, data=request.POST)
+#             if form.is_valid():
+#                 form.save()
+
+#             return redirect('profile', user.id)
+#         return redirect('login')
+
+# LANGUAGE
+class AddLanguageView(View):
+    """View for adding applicant's language"""
 
     def get(self, request):
-        if request.user.is_authenticated:
-            form = LanguagesForm(instance=request.user.applicant)
-            context = {
-                'form': form
-            }
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
 
-            return render(request, 'edit_languages.html', context)
-        return redirect('login')
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        context = {
+            'form': LanguageForm()
+        }
+        return render(request, 'add_language.html', context)
 
     def post(self, request):
-        if request.user.is_authenticated:
-            user = request.user
-            form = LanguagesForm(instance=request.user.applicant, data=request.POST)
-            if form.is_valid():
-                form.save()
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
 
-            return redirect('profile', user.id)
-        return redirect('login')
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        form = LanguageForm(request.POST)
+        if form.is_valid():
+            cd = form.cleaned_data
+            lang = cd.get('language')
+            lvl = cd.get('level')
+            new_lang, _ = Language.objects.get_or_create(
+                language=lang, level=lvl
+            )
+            entries = ApplicantLanguage.objects.filter(applicant_id=request.user.applicant.id)
+            if entries.exists():
+                language = Language.objects.filter(
+                    language=lang, applicant=request.user.applicant).first()
+                if language:
+                    if language.level != lvl:
+                        language.applicant.remove(request.user.applicant)
+            new_lang.applicant.add(request.user.applicant)
+
+            has_errors = False
+            for error in form.errors:
+                messages.error(request, form.errors[error])
+                has_errors = True
+            services.message_succes(request, has_errors=has_errors)
+            return redirect('profile', request.user.id)
 
 
+class EditLanguageView(View):
+    """View for editing applicant's language"""
+
+    def dispatch(self, request, lang_id):
+        method = request.POST.get('method', '').lower()
+        if method == 'delete':
+            return self.delete(request, lang_id)
+        return super().dispatch(request, lang_id)
+
+    def get(self, request, lang_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            lang = request.user.applicant.languages.get(pk=lang_id)
+        except Language.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        context = {
+            'form': LanguageForm(instance=lang),
+            'lang': lang,
+        }
+        return render(request, 'edit_language.html', context)
+
+    def post(self, request, lang_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            lang = request.user.applicant.languages.get(pk=lang_id)
+        except Language.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        form = LanguageForm(request.POST, instance=lang)
+        if form.is_valid():
+            form.save()
+        has_errors = False
+        for error in form.errors:
+            messages.error(request, form.errors[error])
+            has_errors = True
+        services.message_succes(request, has_errors=has_errors)
+        return redirect('profile', request.user.id)
+
+    def delete(self, request, lang_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            lang = request.user.applicant.languages.get(pk=lang_id)
+        except Language.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        lang.delete()
+        return redirect('profile', request.user.id)
+# LANGUAGE END
+
+
+# EDUCATION
+class AddEducationView(View):
+    """View for adding applicant's work experience"""
+
+    def get(self, request):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        context = {
+            'form': EduForm(),
+        }
+        return render(request, 'add_education.html', context)
+
+    def post(self, request):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        form = EduForm(request.POST)
+        if form.is_valid():
+            form.save(commit=False)
+            form.instance.applicant = request.user.applicant
+            form.save()
+
+        has_errors = False
+        for error in form.errors:
+            messages.error(request, form.errors[error])
+            has_errors = True
+        services.message_succes(request, has_errors=has_errors)
+        return redirect('profile', request.user.id)
+
+
+class EditEducationView(View):
+    """View for editing applicant's work experience"""
+
+    def dispatch(self, request, edu_id):
+        method = request.POST.get('method', '').lower()
+        if method == 'delete':
+            return self.delete(request, edu_id)
+        return super().dispatch(request, edu_id)
+
+    def get(self, request, edu_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            edu = request.user.applicant.education.get(pk=edu_id)
+        except Education.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        context = {
+            'form': EduForm(instance=edu),
+            'edu': edu,
+        }
+        return render(request, 'edit_education.html', context)
+
+    def post(self, request, edu_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            edu = request.user.applicant.education.get(pk=edu_id)
+        except Experience.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        form = EduForm(request.POST, instance=edu)
+        if form.is_valid():
+            form.save()
+        has_errors = False
+        for error in form.errors:
+            messages.error(request, form.errors[error])
+            has_errors = True
+        services.message_succes(request, has_errors=has_errors)
+        return redirect('profile', request.user.id)
+
+    def delete(self, request, edu_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            edu = request.user.applicant.education.get(pk=edu_id)
+        except Experience.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        edu.delete()
+        return redirect('profile', request.user.id)
+# EDUCATION END
+
+
+# EXPERIENCE
 class AddExperienceView(View):
-    """View for adding applicant's Work Experience"""
+    """View for adding applicant's work experience"""
 
     def get(self, request):
         if not request.user.is_authenticated:
             return redirect(reverse('login') + services.get_next_path(request))
         
-        user = request.user
-
-        if not user.applicant:
-            return redirect('profile', user.id)
-
-        context = { 
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+     
+        context = {
             'form': ExperienceForm(),
-            'user': user,
         }
-
         return render(request, 'add_experience.html', context)
     
     def post(self, request):
         if not request.user.is_authenticated:
             return redirect(reverse('login') + services.get_next_path(request))
-            
-        user = request.user
-        
-        if not user.applicant:
-            return redirect('profile', user.id)
-            
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+    
         form = ExperienceForm(request.POST)
         if form.is_valid():
             form.save(commit=False)
-            data = form.cleaned_data
-            if not services.is_true_period(data):
-                context = { 
-                    'form': ExperienceForm(data),
-                    'user': user
-                }
-                messages.error(request, 'Неправильный временной промежуток!')
-                return render(request, 'add_experience.html', context)
-            form.instance.applicant = user.applicant
+            form.instance.applicant = request.user.applicant
             form.save()
-        return redirect('profile', user.id)
-
-
-class EditExperienceView(View):
-    """View for editing applicant's Work Experience"""
-
-    def get(self, request):
-        if not request.user.is_authenticated:
-            return redirect(reverse('login') + services.get_next_path(request))
-
-        user = request.user
-        if user.company:
-            return redirect('profile', user.id)
-        
-        form_set = modelformset_factory(Experience, form=ExperienceForm, extra=0)
-        forms = form_set(queryset=Experience.objects.filter(applicant=user.applicant))
-        context = {'forms': forms}
-        return render(request, 'edit_experience.html', context)
-            
-
-    def post(self, request):
-        if not request.user.is_authenticated:
-            return redirect(reverse('login') + services.get_next_path(request))
-
-        user = request.user
-        if user.company:
-            return redirect('profile', user.id)
-
-        form_set = modelformset_factory(Experience, form=ExperienceForm)
-        forms = form_set(request.POST)
-
-        if forms.is_valid():
-            forms.save(commit=False)
-            for form in forms:
-                # data = form.cleaned_data
-                # if not services.is_true_period(data):
-                #     context = {'forms': forms}
-                #     return render(request, 'edit_experience.html', context)
-                form.instance.applicant = user.applicant
-                form.save()
 
         has_errors = False
-        for form in forms:
-           for error in form.errors:
-                messages.error(request, form.errors[error])
-                has_errors = True
-
-        if not has_errors:
-            messages.success(
-                request,
-                mark_safe(
-                    '<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
-            )
-        return redirect('profile', user.id)
-        
-
-class DeleteExperienceView(View):
-    """View for deliting applicant's Work Experience"""
-
-    def get(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(reverse('login') + services.get_next_path(request))
-        
-        if request.user.company:
-            return redirect('profile', request.user.id)
-
-        applicant = request.user.applicant
-
-        try:
-            experience = Experience.objects.filter(pk=kwargs['experience_id']).filter(applicant=applicant).get()
-        except Experience.DoesNotExist:
-            return redirect('profile', request.user.id)
-
-        return render(request, 'delete_work_exp.html', {'experience_id': experience.id})
-
-    def post(self, request, *args, **kwargs):
-        if not request.user.is_authenticated:
-            return redirect(reverse('login') + services.get_next_path(request))
-        
-        if request.user.company:
-            return redirect('profile', request.user.id)
-
-        applicant = request.user.applicant
-
-        try:
-            experience = Experience.objects.filter(pk=kwargs['experience_id']).filter(applicant=applicant).get()
-        except Experience.DoesNotExist:
-            return redirect('profile', request.user.id)
-
-        experience.delete()
+        for error in form.errors:
+            messages.error(request, form.errors[error])
+            has_errors = True
+        services.message_succes(request, has_errors=has_errors)
         return redirect('profile', request.user.id)
+    
 
+class EditExperienceView(View):
+    """View for editing applicant's work experience"""
 
+    def dispatch(self, request, exp_id):
+        method = request.POST.get('method', '').lower()
+        if method == 'delete':
+            return self.delete(request, exp_id)
+        return super().dispatch(request, exp_id)
+
+    def get(self, request, exp_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            exp = request.user.applicant.experience.get(pk=exp_id)
+        except Experience.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        context = {
+            'form': ExperienceForm(instance=exp),
+            'exp': exp,
+        }
+        return render(request, 'edit_experience.html', context)
+
+    def post(self, request, exp_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            exp = request.user.applicant.experience.get(pk=exp_id)
+        except Experience.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        form = ExperienceForm(request.POST, instance=exp)
+        if form.is_valid():
+            form.save()
+        has_errors = False
+        for error in form.errors:
+            messages.error(request, form.errors[error])
+            has_errors = True
+        services.message_succes(request, has_errors=has_errors)
+        return redirect('profile', request.user.id)
+    
+    def delete(self, request, exp_id):
+        if not request.user.is_authenticated:
+            return redirect(reverse('login') + services.get_next_path(request))
+
+        if not request.user.is_applicant:
+            return redirect('profile', request.user.id)
+
+        try:
+            exp = request.user.applicant.experience.get(pk=exp_id)
+        except Experience.DoesNotExist:
+            return render(request, 'errors/404.html')
+
+        exp.delete()
+        return redirect('profile', request.user.id)
+# EXPERIENCE END
+
+        
 class RegistrationView(View):
     """View for register users"""
 

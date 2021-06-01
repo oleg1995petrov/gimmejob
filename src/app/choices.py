@@ -185,7 +185,7 @@ SPHERES = [
     ('ИТ', _('IT'))
 ]
 
-EDUCATION = [
+DEGREE = [
     (None, '---'),
     ('High School Diploma', _('High school diploma')),
     ("Associate degree", _("Associate’s degree")),
@@ -194,7 +194,7 @@ EDUCATION = [
     ('Доктор', _('Доктор'))
 ]
 
-EDUCATION2 = [
+DEGREE2 = [
     (None, '---'),
     ('High School Diploma', _('High school diploma')),
     ("Associate degree", _("Associate’s degree")),
