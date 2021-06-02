@@ -89,18 +89,13 @@ class EditPersonalView(View):
         if request.user.is_authenticated:
             if request.user.is_applicant:
                 applicant = request.user.applicant
-                CATEGORIES = ['education', 'career', 'skills', 'languages']
+                CATEGORIES = ['education', 'career', 'languages']
                 category = request.GET.get('cat')
-                hide = request.GET.get('hide')
-                if hide == '0' or hide:
-                    hide = int(hide)
 
                 user_form = ApplicantEditForm(instance=request.user)
                 profile_form = ApplicantProfileForm(instance=applicant)
                 education_form = EducationForm(instance=applicant)
-                skills_form = SkillsForm(instance=applicant)
                 
-
                 template = 'edit_applicant.html'
                 context = {
                     'applicant': applicant,
@@ -108,45 +103,20 @@ class EditPersonalView(View):
                     'user_form': user_form,
                     'profile_form': profile_form,
                     'education_form': education_form,
-                    'skills_form': skills_form,
                     'categories': CATEGORIES,
                 }
 
                 if category == 'career':
                     if applicant.experience.exists():
                         experience_formset = modelformset_factory(Experience, form=ExperienceForm, extra=1)
-                        if hide:
-                            count = Experience.objects.filter(applicant=applicant).count()
-                            if hide == 0:
-                                q = Experience.objects.filter(applicant=applicant).order_by('-begin', '-end', '-id')[:count - 1]
-                            elif hide == count - 1:
-                                q = Experience.objects.filter(applicant=applicant).order_by('-begin', '-end', '-id')[1:]
-                            else:
-                                q1 = Experience.objects.filter(applicant=applicant)[:hide]
-                                q2 = Experience.objects.filter(applicant=applicant)[hide + 1:]
-                                q = q1.union(q2).order_by('-begin', '-end', '-id')
-                        else:
-                            q = Experience.objects.filter(applicant=applicant)
-                        experience_forms = experience_formset(queryset=q)#Experience.objects.filter(applicant=applicant))
+                        experience_forms = experience_formset(queryset=Experience.objects.filter(applicant=applicant))
                         context['experience_forms'] = experience_forms
                     else:
                         context['experience_form'] = ExperienceForm()
                 elif category == 'languages':
                     if applicant.languages.exists():
                         language_formset = modelformset_factory(Language, form=LanguageForm, extra=1)
-                        if hide:
-                            count = Language.objects.filter(applicant=applicant).count()
-                            if hide == 0:
-                                q = Language.objects.filter(applicant=applicant)[:count - 1]
-                            elif hide == count - 1:
-                                q = Language.objects.filter(applicant=applicant)[1:]
-                            else:
-                                q1 = Language.objects.filter(applicant=applicant)[:hide]
-                                q2 = Language.objects.filter(applicant=applicant)[hide + 1:]
-                                q = q1.union(q2)
-                        else:
-                            q = Language.objects.filter(applicant=applicant)
-                        language_forms = language_formset(queryset=q)#Language.objects.filter(applicant=applicant))
+                        language_forms = language_formset(queryset=Language.objects.filter(applicant=applicant))
                         context['language_forms'] = language_forms
                     else:
                         context['language_form'] = LanguageForm()
@@ -406,30 +376,7 @@ class EditSkillsView(View):
         return redirect('profile', request.user.id)
 
 
-# class EditLanguagesView(View):
-#     """View for editing applicant's languages"""
-
-#     def get(self, request):
-#         if request.user.is_authenticated:
-#             form = LanguagesForm(instance=request.user.applicant)
-#             context = {
-#                 'form': form
-#             }
-
-#             return render(request, 'edit_languages.html', context)
-#         return redirect('login')
-
-#     def post(self, request):
-#         if request.user.is_authenticated:
-#             user = request.user
-#             form = LanguagesForm(instance=request.user.applicant, data=request.POST)
-#             if form.is_valid():
-#                 form.save()
-
-#             return redirect('profile', user.id)
-#         return redirect('login')
-
-# LANGUAGE
+# LANGUAGES
 class AddLanguageView(View):
     """View for adding applicant's language"""
 
@@ -553,7 +500,7 @@ class AddEducationView(View):
             return redirect('profile', request.user.id)
 
         context = {
-            'form': EduForm(),
+            'form': EducationForm(),
         }
         return render(request, 'add_education.html', context)
 
@@ -564,7 +511,7 @@ class AddEducationView(View):
         if not request.user.is_applicant:
             return redirect('profile', request.user.id)
 
-        form = EduForm(request.POST)
+        form = EducationForm(request.POST)
         if form.is_valid():
             form.save(commit=False)
             form.instance.applicant = request.user.applicant
@@ -599,7 +546,7 @@ class EditEducationView(View):
             return render(request, 'errors/404.html')
 
         context = {
-            'form': EduForm(instance=edu),
+            'form': EducationForm(instance=edu),
             'edu': edu,
         }
         return render(request, 'edit_education.html', context)
@@ -615,7 +562,7 @@ class EditEducationView(View):
         except Experience.DoesNotExist:
             return render(request, 'errors/404.html')
 
-        form = EduForm(request.POST, instance=edu)
+        form = EducationForm(request.POST, instance=edu)
         if form.is_valid():
             form.save()
         has_errors = False
@@ -642,7 +589,7 @@ class EditEducationView(View):
 # EDUCATION END
 
 
-# EXPERIENCE
+# WORK EXPERIENCE
 class AddExperienceView(View):
     """View for adding applicant's work experience"""
 
@@ -740,7 +687,7 @@ class EditExperienceView(View):
 
         exp.delete()
         return redirect('profile', request.user.id)
-# EXPERIENCE END
+# WORK EXPERIENCE END
 
         
 class RegistrationView(View):
@@ -922,7 +869,9 @@ class VacancyView(View):
 
 
 # SEARCH
-
+class SearchView(View):
+    def get(self, request):
+        pass
 
 class VacancySearchView(VacancyFilterMixin, ListView):
     """View for vacancy searching"""

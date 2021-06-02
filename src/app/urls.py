@@ -28,6 +28,7 @@ urlpatterns = [
     path('vacancy/<int:vacancy_id>/', views.VacancyView.as_view(), name='vacancy_detail'),
     path('vacancy/', views.EmployerVacancyView.as_view(), name='vacancy_list'),
     # SEARCH
+    path('search/', views.SearchView.as_view(), name='search'),
     path('search/vacancy/', views.VacancySearchView.as_view(), name='vacancy_search'),
     path('search/employer/', views.EmployerSearchView.as_view(), name='employer_search'),
     # PASSWORD CHANGE/RESET

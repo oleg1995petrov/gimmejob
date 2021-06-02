@@ -143,18 +143,9 @@ class PhotoForm(forms.ModelForm):
             if ('photo' in self.changed_data) or (photo == False and self.instance.photo):
                 # if os.path.isfile(self.instance.photo.path):
                 self.instance.photo.delete()
-    
+
 
 class EducationForm(forms.ModelForm):
-    education = forms.CharField(label='Степень *', widget=forms.Select(choices=choices.DEGREE), required=False)
-    specialization = forms.CharField(label='Специализация', widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
-
-    class Meta:
-        model = Applicant
-        fields = ('education', 'specialization')
-
-
-class EduForm(forms.ModelForm):
 
     universiry = forms.CharField(label="Уч. заведение")
     degree = forms.CharField(label="Степень", widget=forms.Select(choices=choices.DEGREE), required=False)
@@ -193,19 +184,6 @@ class ExperienceForm(forms.ModelForm):
         
         if end and begin > end:
             self.add_error('end', 'Укажите правильный временной период')
-            
-
-class SkillsForm(forms.ModelForm):
-    skills = forms.MultipleChoiceField(
-        label='',
-        required=False,
-        choices=choices.SKILLS,
-        widget=forms.CheckboxSelectMultiple()
-    )
-
-    class Meta:
-        model = Applicant
-        fields = ('skills',)
 
 
 class LanguageForm(forms.ModelForm):
