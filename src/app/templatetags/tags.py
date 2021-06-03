@@ -38,7 +38,7 @@ def get_work_period(exp):
     num_months = (month_end - month_begin) + 1
 
     if num_years:
-        num_months += (num_years * 12) - 1
+        num_months += num_years * 12
 
     years = num_months // 12
     months = num_months % 12

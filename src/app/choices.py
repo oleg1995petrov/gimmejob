@@ -9,6 +9,7 @@ YEAR_MIN_WORK = YEAR_NOW - 60
 
 YEARS = [year for year in range(YEAR_MIN, YEAR_MAX, -1)]
 WORK_YEARS = [year for year in range(YEAR_NOW, YEAR_MIN_WORK, -1)]
+EDUCATION_YEARS = [year for year in range(YEAR_NOW + 7, YEAR_MIN_WORK, -1)]
 
 LOCATION2 = [
     (None, '---'),

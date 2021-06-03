@@ -148,10 +148,10 @@ class PhotoForm(forms.ModelForm):
 class EducationForm(forms.ModelForm):
 
     universiry = forms.CharField(label="Уч. заведение")
-    degree = forms.CharField(label="Степень", widget=forms.Select(choices=choices.DEGREE), required=False)
-    specialization = forms.CharField(label="Специализация", widget=forms.Select(choices=choices.SPECIALIZATION), required=False)
-    year_start = forms.DateField(label='Год начала', widget=YearWidget(years=choices.WORK_YEARS), required=False)
-    year_end = forms.DateField(label='Год окончания ', widget=YearWidget(years=choices.WORK_YEARS), required=False)
+    degree = forms.CharField(label="Степень", required=False)
+    specialization = forms.CharField(label="Специализация", required=False)
+    year_start = forms.DateField(label='Год начала', widget=YearWidget(years=choices.EDUCATION_YEARS), required=False)
+    year_end = forms.DateField(label='Год окончания ', widget=YearWidget(years=choices.EDUCATION_YEARS), required=False)
     description = forms.CharField(label="Описание", widget=forms.Textarea(), required=False)
 
     class Meta:

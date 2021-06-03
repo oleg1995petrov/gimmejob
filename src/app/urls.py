@@ -17,13 +17,16 @@ urlpatterns = [
     # APPLICANT
     path('edit/', views.EditPersonalView.as_view(), name='edit_personal'),
     path('edit/photo/', views.EditPhotoView.as_view(), name='edit_photo'),
-    path('edit/skills/', views.EditSkillsView.as_view(), name='edit_skills'),
+
+
     path('edit/education/new/', views.AddEducationView.as_view(), name='add_education'),
     path('edit/education/<int:edu_id>', views.EditEducationView.as_view(), name='edit_education'),
-    path('edit/language/new/', views.AddLanguageView.as_view(), name='add_language'),
-    path('edit/language/<int:lang_id>', views.EditLanguageView.as_view(), name='edit_language'),
     path('edit/experience/new/', views.AddExperienceView.as_view(), name='add_experience'),
     path('edit/experience/<int:exp_id>', views.EditExperienceView.as_view(), name='edit_experience'),
+    path('edit/language/new/', views.AddLanguageView.as_view(), name='add_language'),
+    path('edit/language/<int:lang_id>', views.EditLanguageView.as_view(), name='edit_language'),
+   
+
     # VACANCY
     path('vacancy/<int:vacancy_id>/', views.VacancyView.as_view(), name='vacancy_detail'),
     path('vacancy/', views.EmployerVacancyView.as_view(), name='vacancy_list'),
@@ -32,9 +35,8 @@ urlpatterns = [
     path('search/vacancy/', views.VacancySearchView.as_view(), name='vacancy_search'),
     path('search/employer/', views.EmployerSearchView.as_view(), name='employer_search'),
     # PASSWORD CHANGE/RESET
-    path('password-change/', views.PasswordChangeView.as_view(), name='password_change'),
-    path('password-reset/', views.PasswordResetView.as_view(), name='password_reset'),
-    path('password-reset/<uidb64>/<token>/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
-    path('password-reset/done/', views.PasswordResetLinkView.as_view(), name='password_reset_link'),
-
+    # path('password-change/', views.PasswordChangeView.as_view(), name='password_change'),
+    # path('password-reset/', views.PasswordResetView.as_view(), name='password_reset'),
+    # path('password-reset/<uidb64>/<token>/', views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+    # path('password-reset/done/', views.PasswordResetLinkView.as_view(), name='password_reset_link'),
 ]

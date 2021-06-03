@@ -44,7 +44,7 @@ class UserManager(BaseUserManager):
 class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField('Имя', max_length=255, default='')
     last_name = models.CharField('Фамилия', max_length=255, default='')
-    email = models.EmailField('Электронная почта', max_length=255, unique=True)
+    email = models.EmailField('Электронный адрес', max_length=255, unique=True)
     company = models.CharField('Организация', max_length=100, default='')
     #user_type = models.CharField('Тип пользователя', max_length=15, default='')
     is_active = models.BooleanField('Активная учетная запись', default=True)
@@ -95,9 +95,6 @@ class Applicant(models.Model):
     birthday = models.DateField('Дата рождения', null=True, blank=True)
     location = models.CharField('Город проживания', max_length=50, choices=choices.LOCATION, default='',)
     citizenship = models.CharField('Гражданство', max_length=50, choices=choices.COUNTRIES, default='')
-    # education = models.CharField('Уровень образования', max_length=20, choices=choices.EDUCATION, default='')
-    # specialization = models.CharField('Специализация', max_length=50, choices=choices.SPECIALIZATION, default='')
-    # skills = MultiSelectField('Ключевые навыки', max_length=1000, choices=choices.SKILLS, blank=True, null=True)
     languages = ManyToManyField('Language', through='ApplicantLanguage', verbose_name='Языки', related_name='applicant')
 
     class Meta:
@@ -167,6 +164,11 @@ class Education(models.Model):
     year_end = models.DateField('Год окончания (или ожидаемый)', null=True, blank=True)
     description = models.CharField('Описание', max_length=2000, default='', blank=True)    
 
+    class Meta:
+        verbose_name = 'Образование'
+        verbose_name_plural = 'Образование'
+        ordering = ['-year_end', '-year_start', '-id']
+
 
 class Experience(models.Model):
     """ """
@@ -182,7 +184,7 @@ class Experience(models.Model):
     class Meta:
         verbose_name = 'Опыт работы'
         verbose_name_plural = 'Опыт работы'
-        ordering = ['-begin', '-end', '-id']
+        ordering = ['-end', '-begin', '-id']
 
     def __str__(self):
         return f'Experience of Applicant-{self.applicant.id}'
