@@ -4,6 +4,8 @@ from django.conf import settings
 
 from datetime import date
 
+from app import services
+
 
 register = Library()
 
@@ -23,8 +25,8 @@ def get_messages(context):
 @register.simple_tag
 def get_work_period(exp):
     begin = exp.begin
-    month_begin = begin.month
-    year_begin = begin.year
+    begin_month = begin.month
+    begin_year = begin.year
     end = exp.end
 
     if end:
@@ -34,8 +36,8 @@ def get_work_period(exp):
         month_end = date.today().month
         year_end = date.today().year
 
-    num_years = year_end - year_begin
-    num_months = (month_end - month_begin) + 1
+    num_years = year_end - begin_year
+    num_months = (month_end - begin_month) + 1
 
     if num_years:
         num_months += num_years * 12
@@ -44,12 +46,9 @@ def get_work_period(exp):
     months = num_months % 12
 
     if years and months:
-        res = f'{years} г. {months} мес.'
+        res = f'{services.get_year_ending(years)} {months} мес.'
     elif years:
-        if years % 10 in [1, 2, 3, 4] and years not in [11, 12, 13, 14]:
-            res = f'{years} г'
-        else:
-            res = f'{years} л'
+        res = f'{services.get_year_ending(years)} {months} мес.'
     else:
         res = f'{months} мес.'
     return res

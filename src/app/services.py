@@ -52,3 +52,11 @@ def message_succes(request, has_errors=False):
             request,
             mark_safe('<b>Изменения сохранены.</b><br>Ваш профиль был успешно обновлен.')
         )
+
+
+def get_year_ending(years: int):
+    if years % 10 in [1, 2, 3, 4] and years not in [11, 12, 13, 14]:
+        res = f'{years} г.'
+    else:
+        res = f'{years} л.'
+    return res
