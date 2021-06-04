@@ -147,7 +147,7 @@ class PhotoForm(forms.ModelForm):
 
 class EducationForm(forms.ModelForm):
 
-    universiry = forms.CharField(label="Уч. заведение")
+    institution = forms.CharField(label="Уч. заведение")
     degree = forms.CharField(label="Степень", required=False)
     specialization = forms.CharField(label="Специализация", required=False)
     year_start = forms.DateField(label='Год начала', widget=YearWidget(years=choices.EDUCATION_YEARS), required=False)
@@ -161,10 +161,10 @@ class EducationForm(forms.ModelForm):
 
 class ExperienceForm(forms.ModelForm):
    
-    position = forms.CharField(label="Должность *")
+    position = forms.CharField(label="Должность")
     employment = forms.CharField(label='Тип занятости', widget=forms.Select(choices=choices.EMPLOYMENT), required=False)
-    company = forms.CharField(label='Компания *')
-    begin = forms.DateField(label='Дата начала *', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
+    company = forms.CharField(label='Компания')
+    begin = forms.DateField(label='Дата начала', widget=MonthYearWidget(years=choices.WORK_YEARS))
     end = forms.DateField(label='Дата окончания', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
     description = forms.CharField(label='Описание', widget=forms.Textarea(), required=False)
     

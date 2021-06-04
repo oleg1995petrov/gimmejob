@@ -157,7 +157,7 @@ class ApplicantLanguage(models.Model):
 
 class Education(models.Model):
     applicant = models.ForeignKey(Applicant, on_delete=models.CASCADE, verbose_name='Соискатель', related_name='education')
-    universiry = models.CharField('Уч. заведение', max_length=200, default='')
+    institution = models.CharField('Уч. заведение', max_length=200, default='')
     degree = models.CharField('Степень', max_length=100, default='', blank=True)
     specialization = models.CharField('Специализация', max_length=100, default='', blank=True)
     year_start = models.DateField('Год начала', null=True, blank=True)
