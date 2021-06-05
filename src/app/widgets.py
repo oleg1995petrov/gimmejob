@@ -6,7 +6,7 @@ from django.forms.widgets import Widget, Select
 from django.utils.dates import MONTHS
 from django.utils.safestring import mark_safe
 
-__all__ = ('MonthYearWidget',)
+# __all__ = ('MonthYearWidget',)
 
 RE_DATE = re.compile(r'(\d{4})-(\d\d?)-(\d\d?)$')
 
@@ -132,10 +132,6 @@ class YearWidget(Widget):
         output.append(select_html)
 
         return mark_safe(u'\n'.join(output))
-
-    # def id_for_label(self, id_):
-    #     return '%s_month' % id_
-    # id_for_label = classmethod(id_for_label)
 
     def value_from_datadict(self, data, files, name):
         y = data.get(self.year_field % name)

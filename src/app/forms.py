@@ -7,15 +7,12 @@ from django.contrib.auth.forms import (
 from ckeditor.widgets import CKEditorWidget
 
 from PIL import Image
-import os
-from django.forms import fields
 
-from django.http import request
 from django.forms.utils import ErrorDict
 
-from . import services, choices
-from .models import User, Applicant, Employer, Education, Experience, Vacancy, Language, ApplicantLanguage
-from .widgets import MonthYearWidget, YearWidget
+from . import choices
+from . import models
+from . import widgets
 
 
 
@@ -37,17 +34,22 @@ class ApplicantCreationForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'placeholder': 'Last name'})
     )
     email = forms.EmailField(
-        label='', widget=forms.TextInput(attrs={'placeholder': 'Email address'})
+        label='', 
+        widget=forms.TextInput(attrs={'placeholder': 'Email address'})
     )
     password1 = forms.CharField(
-        label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
+        label='', 
+        min_length=8, 
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password'})
     )
     password2 = forms.CharField(
-        label='', min_length=8, widget=forms.PasswordInput(attrs={'placeholder': 'Password again'})
+        label='', 
+        min_length=8, 
+        widget=forms.PasswordInput(attrs={'placeholder': 'Password again'})
     )
 
     class Meta:
-        model = User
+        model = models.User
         fields = ('first_name', 'last_name', 'email')
         # fields = ('email',)
 
@@ -79,7 +81,7 @@ class ApplicantEditForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'placeholder': 'Email'}))
 
     class Meta:
-        model = User
+        model = models.User
         fields = ('first_name', 'last_name', 'email')
     
     def clean(self):
@@ -116,7 +118,7 @@ class ApplicantProfileForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Applicant
+        model = models.Applicant
         fields = ('birthday', 'location', 'citizenship')      
 
 
@@ -128,7 +130,7 @@ class PhotoForm(forms.ModelForm):
     )
 
     class Meta:
-        model = Applicant
+        model = models.Applicant
         fields = ('photo',)
 
     def clean(self):
@@ -136,7 +138,7 @@ class PhotoForm(forms.ModelForm):
         photo = cd['photo']
         
         if photo:
-            if photo.size > Applicant.MAX_PHOTO_SIZE:
+            if photo.size > models.Applicant.MAX_PHOTO_SIZE:
                 raise forms.ValidationError('Слишком большой вес изображения!')
 
         if self.has_changed():
@@ -150,26 +152,52 @@ class EducationForm(forms.ModelForm):
     institution = forms.CharField(label="Уч. заведение")
     degree = forms.CharField(label="Степень", required=False)
     specialization = forms.CharField(label="Специализация", required=False)
-    year_start = forms.DateField(label='Год начала', widget=YearWidget(years=choices.EDUCATION_YEARS), required=False)
-    year_end = forms.DateField(label='Год окончания ', widget=YearWidget(years=choices.EDUCATION_YEARS), required=False)
-    description = forms.CharField(label="Описание", widget=forms.Textarea(), required=False)
+    year_begin = forms.DateField(
+        label='Год начала', 
+        widget=widgets.YearWidget(years=choices.EDUCATION_YEARS, required=False), 
+        required=False
+    )
+    year_end = forms.DateField(
+        label='Год окончания ', 
+        widget=widgets.YearWidget(years=choices.EDUCATION_YEARS, required=False), 
+        required=False
+    )
+    description = forms.CharField(
+        label="Описание", 
+        widget=forms.Textarea(), 
+        required=False
+    )
 
     class Meta:
-        model = Education
+        model = models.Education
         exclude = ('applicant',)
    
 
 class ExperienceForm(forms.ModelForm):
    
     position = forms.CharField(label="Должность")
-    employment = forms.CharField(label='Тип занятости', widget=forms.Select(choices=choices.EMPLOYMENT), required=False)
+    employment = forms.CharField(
+        label='Тип занятости', 
+        widget=forms.Select(choices=choices.EMPLOYMENT), 
+        required=False
+        )
     company = forms.CharField(label='Компания')
-    begin = forms.DateField(label='Дата начала', widget=MonthYearWidget(years=choices.WORK_YEARS))
-    end = forms.DateField(label='Дата окончания', widget=MonthYearWidget(years=choices.WORK_YEARS), required=False)
-    description = forms.CharField(label='Описание', widget=forms.Textarea(), required=False)
+    begin = forms.DateField(
+        label='Дата начала', 
+        widget=widgets.MonthYearWidget(years=choices.WORK_YEARS)
+    )
+    end = forms.DateField(
+        label='Дата окончания', 
+        widget=widgets.MonthYearWidget(years=choices.WORK_YEARS, required=False), 
+        required=False)
+    description = forms.CharField(
+        label='Описание', 
+        widget=forms.Textarea(), 
+        required=False
+    )
     
     class Meta:
-        model = Experience
+        model = models.Experience
         exclude = ('applicant',)
 
     def clean(self):
@@ -199,7 +227,7 @@ class LanguageForm(forms.ModelForm):
     )
             
     class Meta:
-        model = Language
+        model = models.Language
         fields = '__all__'
    
 
@@ -230,7 +258,7 @@ class EmployerCreationForm(forms.ModelForm):
     )
 
     class Meta:
-        model = User
+        model = models.User
         # fields = ('first_name', 'last_name', 'email', 'company')
         fields = ('email', 'company')
 
@@ -268,7 +296,7 @@ class EmployerEditForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'placeholder': 'Company name'}))
 
     class Meta:
-        model = User
+        model = models.User
         fields = ('first_name', 'last_name', 'email', 'company')
 
 
@@ -279,29 +307,28 @@ class EmployerProfileForm(forms.ModelForm):
         widget=ClearableFileInput()
     )
     company_email = forms.EmailField(
-        required=False, 
         label='', 
+        required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Company email'})
     )
     company_site = forms.URLField(
-        required=False, 
         label='', 
+        required=False,
         widget=forms.TextInput(attrs={'placeholder': 'Company website: http://'})
     )
     company_info = forms.CharField(
-        required=False, 
-        label='About the company', 
+        label='About the company',
+        required=False,
         widget=CKEditorWidget()
     )
     company_spheres = forms.MultipleChoiceField(
-        required=True, 
         label='Company scopes',
         choices=choices.SPHERES,
         widget=forms.CheckboxSelectMultiple(), 
     )
 
     class Meta:
-        model = Employer
+        model = models.Employer
         fields = ('photo', 'company_email', 'company_site', 'company_info', 'company_spheres')
 
     def clean(self):
@@ -315,14 +342,13 @@ class EmployerProfileForm(forms.ModelForm):
             width, height = pht.width, pht.height
             coef = width / height
 
-            if photo.size > Employer.MAX_PHOTO_SIZE:
+            if photo.size > models.Employer.MAX_PHOTO_SIZE:
                 raise forms.ValidationError('Максимальный размер логотипа - 1 мегабайт!')
             if coef < min_coef or coef > max_coef:
                 raise forms.ValidationError('Логотип должен быть квадратной формы!')
 
         if self.has_changed():
             if 'photo' in self.changed_data or photo == False and self.instance.photo:
-                # if os.path.isfile(self.instance.photo.path):
                 self.instance.photo.delete()
 
 
@@ -330,11 +356,11 @@ class VacancyForm(forms.ModelForm):
     salary = forms.IntegerField(required=False, min_value=0, label='Уровень оплаты')
     currency = forms.ChoiceField(choices=choices.CURRENCIES, label='Валюта', required=False)
     body = forms.CharField(widget=CKEditorWidget(), label='Описание вакансии')
-    # schedule = forms.ChoiceField(choices=Vacancy.VacancySchedule.choices, widget=forms.CheckboxSelectMultiple(), label='Валюта', required=False)
+    # schedule = forms.ChoiceField(choices=choices.SCHEDULE, widget=forms.CheckboxSelectMultiple(), required=False)
     
     class Meta:
-        model = Vacancy
-        fields = ('active', 'position', 'experience', 'employment', 'schedule', 'salary', 'currency', 'body')
+        model = models.Vacancy
+        exclude = ('employer', 'published')
 
 
 # PASSWORD 

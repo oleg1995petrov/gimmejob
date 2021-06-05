@@ -1,5 +1,5 @@
 from django.contrib import admin
-from src.settings import AUTH_USER_MODEL, MEDIA_URL
+from src.settings import AUTH_USER_MODEL, STATIC_URL 
 from django.utils.safestring import mark_safe
 from django.utils.html import format_html
 from django.contrib.auth.models import Permission, Group
@@ -7,32 +7,31 @@ from django.contrib.auth.models import Permission, Group
 from .models import Applicant, Education, Employer, Experience, Vacancy, User, Language, ApplicantLanguage
 
 
+def get_photo(obj):
+    try:
+        return mark_safe(f'<img src={obj.photo.url} width="50" height="60">')
+    except (ValueError, AttributeError):
+        return mark_safe(f'<img src="{ STATIC_URL }images/anonymous.gif" width="50" height="60">')
+
+
 class ApplicantInline(admin.TabularInline): # or admin.StackedInline
     model = Applicant
-    readonly_fields = ('photo', 'get_image', 'birthday', 'location', 'citizenship')#, 
-                        # 'education', 'specialization', 'skills', 'languages')
+    readonly_fields = ('photo', 'get_photo', 'birthday', 'location', 'citizenship')
+                       
+    def get_photo(self, obj):
+        return get_photo(obj)
 
-    def get_image(self, obj):
-        try:
-            return mark_safe(f'<img src={ obj.photo.url } width="60" height="80">')
-        except ValueError:
-            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="80">')
-
-    get_image.short_description = 'Фото'
+    get_photo.short_description = 'Фото'
 
 
 class EmployerInline(admin.TabularInline): # or admin.StackedInline
     model = Employer
-    readonly_fields = ('photo', 'get_image', 'company_email', 'company_site', 'company_info', 
-                        'company_spheres', )
+    readonly_fields = ('photo', 'get_photo', 'email', 'site', 'description', 'scope', )
 
-    def get_image(self, obj):
-        try:
-            return mark_safe(f'<img src={ obj.photo.url } width="60" height="80">')
-        except ValueError:
-            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="80">')
+    def get_photo(self, obj):
+        return get_photo(obj)
 
-    get_image.short_description = 'Лого'
+    get_photo.short_description = 'Лого'
 
 
 class VacancyInline(admin.TabularInline):  # or admin.StackedInline
@@ -74,14 +73,6 @@ class UserAdmin(admin.ModelAdmin):
     
     get_fullname.short_description = 'ФИО'
 
-    def get_image(self, obj):
-        try:
-            return mark_safe(f'<img src={obj.photo.url} width="60" height="80">')
-        except (ValueError, AttributeError):
-            return mark_safe(f'<img src={MEDIA_URL}blank.png width="60" height="80">')
-
-    get_image.short_description = 'Фото/Лого'
-
     def get_form(self, request, obj=None, **kwargs):
         form = super().get_form(request, obj, **kwargs)
         is_superuser = request.user.is_superuser
@@ -101,41 +92,32 @@ class UserAdmin(admin.ModelAdmin):
 
 @admin.register(Applicant)
 class ApplicantAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_image')
-    list_display_links = ('user', 'get_image')
-    list_filter = ('photo','birthday', 'location', 'citizenship')#, 'education', 
-                    # 'specialization'), 'skills', 'languages')
-    search_fields = ('photo', 'birthday', 'location', 'citizenship', 'user__first_name')#, 'education',
-                    #  'specialization', 'skills', 'languages', )
-    readonly_fields = ('user', 'photo', 'get_image', 'birthday', 'location', 'citizenship')#, 
-                        # 'education', 'specialization', 'skills', 'languages')
+    list_display = ('user', 'get_photo')
+    list_display_links = ('user', 'get_photo')
+    list_filter = ('photo','birthday', 'location', 'citizenship')
+    search_fields = ('photo', 'birthday', 'location', 'citizenship', 'user__first_name')
+    readonly_fields = ('user', 'photo', 'get_photo', 'birthday', 'location', 'citizenship') 
     #inlines = [ExperienceInline]
 
-    def get_image(self, obj):
-        try:
-            return mark_safe(f'<img src={ obj.photo.url } width="60" height="80">')
-        except ValueError:
-            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="80">')
+    def get_photo(self, obj):
+        return get_photo(obj)
 
-    get_image.short_description = 'Фото'
+    get_photo.short_description = 'Фото'
 
 
 @admin.register(Employer)
 class EmployerAdmin(admin.ModelAdmin):
-    list_display = ('user', 'get_image')
-    list_display_links = ('user', 'get_image')
-    list_filter = ('company_spheres',)
-    search_fields = ('company_email', 'company_site', 'company_info')
-    readonly_fields = ('user', 'photo', 'get_image', 'company_email', 'company_site', 'company_info', 'company_spheres')
+    list_display = ('user', 'get_photo')
+    list_display_links = ('user', 'get_photo')
+    list_filter = ('scope',)
+    search_fields = ('email', 'site', 'description')
+    readonly_fields = ('user', 'photo', 'get_photo', 'email', 'site', 'description', 'scope')
     inlines = [VacancyInline]
 
-    def get_image(self, obj):
-        try:
-            return mark_safe(f'<img src={ obj.photo.url } width="60" height="60">')
-        except ValueError:
-            return mark_safe(f'<img src={ MEDIA_URL }blank.png width="60" height="60">')
+    def get_photo(self, obj):
+        return get_photo(obj)
 
-    get_image.short_description = 'Лого'
+    get_photo.short_description = 'Лого'
 
 
 @admin.register(Vacancy)
@@ -173,8 +155,9 @@ class VacancyAdmin(admin.ModelAdmin):
 class PermissionAdmin(admin.ModelAdmin):
     # list_display = ('name', 'permissions')
 
-    def get_perm(self):
-        return Group.objects.filter()
+    # def get_perm(self):
+    #     return Group.objects.filter()
+    pass
 
 
 admin.site.unregister(Group)
